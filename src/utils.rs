@@ -1,6 +1,6 @@
 use ratatui::layout::{Constraint, Flex, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style, Stylize};
-use ratatui::text::Span;
+use ratatui::text::{Line, Span, Text};
 use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::DefaultTerminal;
 
@@ -22,44 +22,26 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
     terminal.clear().expect("Unusable terminal clear");
     terminal
         .draw(|frame| {
-            let greeting = Paragraph::new(
-                "      __             _        
- _ __/ _\\_ __   __ _| | _____ 
-| '__\\ \\| '_ \\ / _` | |/ / _ \\
-| |  _\\ \\ | | | (_| |   <  __/
-|_|  \\__/_| |_|\\__,_|_|\\_\\___|
-",
-            )
-            .centered()
-            .red();
-            //NB: easier to use centered line then center_h (my own custom function)
-            let sub_title = Span::styled(
-                "Welcome to the craziest Snake ever! 🐍",
-                Style::default().fg(Color::Yellow),
-            )
-            .into_centered_line();
-            let instructions = Span::styled(
-                "Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit ❌  ",
-                Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
-            )
-            .into_centered_line();
-            let bordure = Block::bordered().border_type(BorderType::Double);
-            frame.render_widget(greeting, frame.area());
-            frame.render_widget(bordure, frame.area());
-            frame.render_widget(sub_title, top_margin(frame.area(), 5));
-            frame.render_widget(instructions, top_margin(frame.area(), 6));
-            //if not centered line :
-            //frame.render_widget(instructions, center_h(top_margin(frame.area(), 6), 60));
-
-            /*
-            let area = center_h(
+            //more idiomatic using lines (as in :https://ratatui.rs/recipes/render/display-text/)
+            //can mix style inside the same line using Line::from(vec!["hello".green(), " ".into(), "world".green().bold(), "3".into()]),
+            let text = Text::from(vec![
+                Line::from("███████╗ ███╗   ██╗  █████╗  ██╗  ██╗ ███████╗"),
+                Line::from("██╔════╝ ████╗  ██║ ██╔══██╗ ██║ ██╔╝ ██╔════╝"),
+                Line::from("███████╗ ██╔██╗ ██║ ███████║ █████╔╝  █████╗"),
+                Line::from("╚════██║ ██║╚██╗██║ ██╔══██║ ██╔═██╗  ██╔══╝"),
+                Line::from("███████║ ██║ ╚████║ ██║  ██║ ██║  ██╗ ███████╗"),
+                Line::from("╚══════╝ ╚══════╝╚═ ╝  ╚═══╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝"),
+                Line::from("Welcome to the craziest Snake ever! 🐍").green(),
+                Line::from("Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit ❌  ")
+                    .bold()
+                    .green(),
+            ]);
+            frame.render_widget(
+                Paragraph::new(text)
+                    .centered()
+                    .block(Block::bordered().border_type(BorderType::Double)),
                 frame.area(),
-                //span.width buggy with unicode
-                Constraint::Length(u16::try_from(45).expect("Too long text to fit in u16")),
             );
-            let area_instruct = top_margin(area, 5);
-            frame.render_widget(span, area_instruct);
-            frame.render_widget(instructions, top_margin(area_instruct, 65));*/
         })
         .expect("Unusable terminal render");
 }

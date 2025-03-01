@@ -1,12 +1,12 @@
 use crate::map::Map;
 use crate::snake::direction::Direction;
-use crate::snake::snake::Snake;
+use crate::snake::snake_moving::SnakeMoving;
 use crate::snake::speed::Speed;
 use crate::utils::greeting;
 use crossterm::event;
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
 use ratatui::layout::Rect;
-use ratatui::text::Span;
+use ratatui::style::Modifier;
 use ratatui::widgets::Paragraph;
 use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
@@ -16,11 +16,11 @@ use std::{io, thread};
 
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
 /// Displays a blinking "Game Over" message using ratatui.
-pub fn game_over_blinking(terminal: &mut DefaultTerminal) -> io::Result<()> {
+pub fn the_end(terminal: &mut DefaultTerminal) -> io::Result<()> {
     use ratatui::{
         layout::{Alignment, Rect},
         style::{Color, Style},
-        text::{Span, Text},
+        text::Text,
         widgets::Paragraph,
     };
     use std::{thread, time::Duration};
@@ -58,7 +58,7 @@ pub fn game_over_blinking(terminal: &mut DefaultTerminal) -> io::Result<()> {
             frame.render_widget(block, area);
         })?;
 
-        thread::sleep(blink_duration);
+        sleep(blink_duration);
     }
 
     Ok(())
@@ -66,18 +66,19 @@ pub fn game_over_blinking(terminal: &mut DefaultTerminal) -> io::Result<()> {
 
 pub struct Game {
     speed: Speed,
-    serpent: Arc<RwLock<Snake<'static>>>,
+    serpent: Arc<RwLock<SnakeMoving<'static>>>,
     direction: Arc<RwLock<Direction>>,
     //NB: if does not want to clone later, use only Arc<Map> (immuable)
     carte: Map<'static>,
     life: Arc<RwLock<u16>>,
     score: Arc<RwLock<u32>>,
+    game_over: Arc<RwLock<bool>>,
     terminal: DefaultTerminal,
 }
 impl Game {
     pub fn new(
         speed: Speed,
-        serpent: Snake<'static>,
+        serpent: SnakeMoving<'static>,
         carte: Map<'static>,
         life: u16,
         terminal: DefaultTerminal,
@@ -89,10 +90,11 @@ impl Game {
             carte,
             life: Arc::new(RwLock::new(life)),
             score: Arc::new(RwLock::new(0)),
+            game_over: Arc::new(RwLock::new(false)),
             terminal,
         }
     }
-    pub fn run(&mut self) -> io::Result<()> {
+    pub fn render(&mut self) {
         loop {
             //if self.serpent.read().unwrap().is_alive {
             //for text display: https://ratatui.rs/recipes/render/display-text/
@@ -106,16 +108,40 @@ impl Game {
                         Rect::new(20, 0, 15, 1),
                     );
                     //life
+                    //alt: try_from, or_unwrap etc. (heavy there)
 
                     let life = *self.life.read().unwrap() as usize;
                     frame.render_widget(
                         Paragraph::new(format!(" life: {} ", "❤️ ".repeat(life))),
-                        Rect::new(40, 0, u16::try_from(7 * life).unwrap_or(21), 1),
+                        #[allow(clippy::cast_possible_truncation)]
+                        Rect::new(40, 0, (7 * life) as u16, 1),
                     );
                     //serpent //circle bad on not squared terminal => use emoji with position
                     frame.render_widget(self.serpent.read().unwrap().get_widget(), frame.area());
+                    //if the game is finished write on everything that it is over !
+                    if *self.game_over.read().unwrap() {
+                        frame.render_widget(
+                            //🎮 ❌  GAME OVER ❌  🎮
+                            Paragraph::new(
+                                "\
+             ██████╗  █████╗ ███╗   ███╗███████╗       ██████╗ ██╗   ██╗███████╗██████╗ \n\
+            ██╔═══   ██╔══██╗████╗ ████║██╔════╝      ██╔═══██╗██║   ██║██╔════╝██╔══██╗\n\
+            ██║ ████║███████║██╔████╔██║█████╗        ██║   ██║██║   ██║█████╗  ██████╔╝\n\
+            ██║   ██║██╔══██║██║╚██╔╝██║██╔══╝        ██║   ██║██║   ██║██╔══╝  ██╔══██╗\n\
+            ╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗      ╚██████╔╝╚██████╔╝███████╗██║  ██║\n\
+             ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝       ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝",
+                            )
+                            .style(
+                                ratatui::style::Style::default()
+                                    .fg(ratatui::style::Color::Red)
+                                    .add_modifier(Modifier::BOLD),
+                            )
+                            .alignment(ratatui::layout::Alignment::Center),
+                            Rect::new(10, 1, 100, 9),
+                        );
+                    }
                 })
-                .expect("TODO: panic message");
+                .expect("bad rendering, check snake position");
             /*} else {
                 game_over_blinking(&mut self.terminal).expect("TODO: panic message");
                 sleep(Duration::from_millis(100));
@@ -146,11 +172,11 @@ impl Game {
     pub fn start(&mut self) {
         self.greeting();
 
-        // be carreful not all thread on snake or deadlock => put a max of variable out of snake
+        // be careful not all thread on snake or deadlock => put a max of variable out of snake
         // Prepare thread use of variable
-        let thread_snake = Arc::clone(&self.serpent);
         let game_logic_snake = Arc::clone(&self.serpent);
         let game_life = Arc::clone(&self.life);
+        let game_over = Arc::clone(&self.game_over);
         let game_score = Arc::clone(&self.score);
         let game_direction_logic = Arc::clone(&self.direction);
         let game_direction_input = Arc::clone(&self.direction);
@@ -159,21 +185,36 @@ impl Game {
         let carte = self.carte.clone();
         // game logic
         thread::spawn(move || loop {
-            match game_logic_snake
-                .write()
-                .unwrap()
-                .ramp(&game_direction_logic.read().unwrap())
-            {
-                Ok((x, y)) => {
-                    if (carte.out_of_map(x, y)) {
-                        *game_life.write().unwrap() -= 1;
+            //dead snakes tell no tales, nor move :p
+            if *game_life.read().unwrap() > 0 {
+                //Check if we have move without biting ourselves (Err), and getting head position after the move
+                if let Ok((x, y)) = game_logic_snake
+                    .write()
+                    .unwrap()
+                    .ramp(&game_direction_logic.read().unwrap())
+                {
+                    //then check we are not out of the map
+                    if carte.out_of_map(x, y) {
+                        let mut life = game_life.write().unwrap();
+                        if (*life) >= 1 {
+                            *life -= 1;
+                        }
+                        if (*life == 0) {
+                            *game_over.write().unwrap() = true;
+                        }
+                    }
+                    //did we find out a fruit ?
+                } else {
+                    //ouch bite ourselves !
+                    let mut life = game_life.write().unwrap();
+                    if (*life) >= 1 {
+                        *life -= 1;
+                    }
+                    if (*life == 0) {
+                        *game_over.write().unwrap() = true;
                     }
                 }
-                Err(()) => {
-                    *game_life.write().unwrap() -= 1;
-                }
             }
-
             sleep(Duration::from_millis(game_speed));
         });
 
@@ -185,7 +226,7 @@ impl Game {
         });
 
         // Graphical thread
-        if let Err(_e) = self.run() {}
+        self.render();
     }
 }
 // Gestion des événements clavier extraite dans une fonction

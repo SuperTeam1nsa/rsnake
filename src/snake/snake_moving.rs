@@ -1,39 +1,34 @@
 use crate::snake::direction::Direction;
 use crate::snake::snake_body::SnakeBody;
-use crate::snake::speed::Speed;
 use ratatui::layout::Rect;
 use ratatui::prelude::Widget;
 
-pub struct Snake<'a> {
-    position: Rect,
+//Can be mixed with sanke_body as wrapper is so thin now !
+pub struct SnakeMoving<'a> {
     size_square: u16,
-    pub direction: Direction,
-    pub is_alive: bool,
-    body: SnakeBody<'a>, // easier but ugly: Vec<Circle>,
-                         /*
-                         body: vec![Circle {
-                                     x: f64::from(position_ini.0),
-                                     y: f64::from(position_ini.1),
-                                     radius: f64::from(size_square),
-                                     color: Color::Cyan,
-                                 }]
-                          */
+    body: SnakeBody<'a>,
+    // easier but ugly: Vec<Circle>,
+    /*
+    body: vec![Circle {
+                x: f64::from(position_ini.0),
+                y: f64::from(position_ini.1),
+                radius: f64::from(size_square),
+                color: Color::Cyan,
+            }]
+     */
 }
 
-impl<'a> Snake<'a> {
+impl<'a> SnakeMoving<'a> {
     pub fn new(
         size_square: u16,
         body_image: &'a str,
         head_image: &'a str,
         nb_element_body: u16,
-    ) -> Snake<'a> {
+    ) -> SnakeMoving<'a> {
         let x_ini: u16 = 50;
         let y_ini: u16 = 5;
-        Snake {
-            position: Rect::new(x_ini, y_ini, size_square, size_square),
+        SnakeMoving {
             size_square,
-            direction: Direction::Left,
-            is_alive: true,
             body: SnakeBody::new(
                 body_image,
                 head_image,
