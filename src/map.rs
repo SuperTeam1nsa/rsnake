@@ -3,33 +3,32 @@ use ratatui::style::{Color, Style, Stylize};
 use ratatui::text::Span;
 use ratatui::widgets::{Block, BorderType, Borders, Padding, Paragraph, Wrap};
 use ratatui::{symbols, DefaultTerminal};
-
+#[derive(Clone)]
 pub struct Map<'a> {
-    rect: Rect,
     block: Block<'a>,
     case_size: u16,
+    viewport: Rect,
 }
 impl Map<'_> {
-    /// the two first arguments are a number of case of size 'case_size_in_px' to create the map
-    pub fn new<'a>(nb_of_width_case: u16, nb_of_height_case: u16, case_size_in_px: u16) -> Map<'a> {
+    /// the map is resizable and is the writeable size of the terminal
+    pub fn new<'a>(case_size_in_px: u16, viewport: Rect) -> Map<'a> {
         Map {
-            rect: Rect::new(
-                0,
-                0,
-                nb_of_width_case * case_size_in_px,
-                nb_of_height_case * case_size_in_px,
-            ),
             block: Block::bordered()
                 .border_type(BorderType::Double)
                 .title("Snake !"),
             case_size: case_size_in_px,
+            viewport,
         }
     }
     pub fn out_of_map(&self, x: u16, y: u16) -> bool {
-        !(x < self.rect.width && y < self.rect.height)
+        let x_max = self.viewport.width - self.case_size;
+        let y_max = self.viewport.height - (self.case_size / 2);
+        let x_min = self.case_size;
+        let y_min = self.case_size / 2;
+        x < x_min || x > x_max || y < y_min || y > y_max
     }
-    pub fn get_rect(&self) -> &Rect {
-        &self.rect
+    pub fn area(&self) -> &Rect {
+        &self.viewport
     }
     pub fn get_widget(&self) -> &Block {
         &self.block

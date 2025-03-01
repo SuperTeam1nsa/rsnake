@@ -6,35 +6,25 @@ mod map;
 mod snake;
 mod utils;
 
+use snake::speed::{PredefinedSpeed, Speed};
 // inspi: https://ratatui.rs/tutorials/hello-world/
 use crate::game::Game as Jeu;
 
 use crate::map::Map as Carte;
-use crate::snake::Snake;
-use crate::snake::{Direction, PredDefinedSpeed, Speed};
-
+use snake::snake::Snake;
 fn main() {
-    //exemple: https://ratatui.rs/examples/widgets/canvas/
-    /*
-               ball: Circle {
-               x: 20.0,
-               y: 40.0,
-               radius: 10.0,
-               color: Color::Yellow,
-           }
-               let block = Block::bordered()
-        .border_type(border_type)
-        .title(format!("BorderType::{border_type:#?}"));
-    frame.render_widget(paragraph.clone().block(block), area);
-    */
+    //exemple: https://ratatui.rs/examples/widgets/canvas/ (moche / moins bien que emoji)
     //can capture mouse in terminal
-    //use block for map : https://ratatui.rs/examples/widgets/block/
+    //idea
+    //RwLock + 1 thread (bloquant) input, 1 affichage (60Hz) , 1 déplacement élément (serpent etc) 🐍,
+    // 1 game logic en principal time 2x vitesse d'affichage qui joue les actions sur les objects etc  (pourrait être mélange avec le rendering )
     let case_size = 2;
-    let terminal = ratatui::init();
-    let map: Carte = Carte::new(180, 17, case_size);
-    let speed: Speed = Speed::new(PredDefinedSpeed::Normal, 10f32);
-    let serpent: Snake = Snake::new((50, 5), Direction::Left, speed, case_size, "❄️", 10);
-    let mut jeu: Jeu = game::Game::new(serpent, map, 3, terminal);
+    let mut terminal = ratatui::init();
+    let map: Carte = Carte::new(case_size, terminal.get_frame().area());
+    let speed: Speed = Speed::new(PredefinedSpeed::Normal, 10);
+    //if refacto: builder pattern possible (here we create the snake only once)
+    let serpent: Snake = Snake::new(case_size, "❄️", "🎄", 10);
+    let mut jeu: Jeu = game::Game::new(speed, serpent, map, 14, terminal);
     jeu.start();
     ratatui::restore();
 }

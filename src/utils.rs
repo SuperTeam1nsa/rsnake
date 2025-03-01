@@ -1,11 +1,12 @@
 use ratatui::layout::{Constraint, Flex, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Color, Modifier, Style, Stylize};
 use ratatui::text::Span;
-use ratatui::widgets::Paragraph;
+use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::DefaultTerminal;
 
-pub fn center_h(area: Rect, horizontal: Constraint) -> Rect {
-    let [area] = Layout::horizontal([horizontal])
+pub fn center_h(area: Rect, nb_of_max_char: u16) -> Rect {
+    //, horizontal: Constraint
+    let [area] = Layout::horizontal([Constraint::Length(nb_of_max_char)])
         .flex(Flex::Center)
         .areas(area);
     //let [area] = Layout::vertical([vertical]).flex(Flex::Center).areas(area);
@@ -30,13 +31,27 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
 ",
             )
             .centered()
-            .red()
-            .on_dark_gray();
-            let span = Span::styled(
-                "('q' to quit), Use ⬆️➡️⬇️⬅️ to move",
+            .red();
+            //NB: easier to use centered line then center_h (my own custom function)
+            let sub_title = Span::styled(
+                "Welcome to the craziest Snake ever! 🐍",
                 Style::default().fg(Color::Yellow),
-            );
+            )
+            .into_centered_line();
+            let instructions = Span::styled(
+                "Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit ❌  ",
+                Style::new().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+            )
+            .into_centered_line();
+            let bordure = Block::bordered().border_type(BorderType::Double);
             frame.render_widget(greeting, frame.area());
+            frame.render_widget(bordure, frame.area());
+            frame.render_widget(sub_title, top_margin(frame.area(), 5));
+            frame.render_widget(instructions, top_margin(frame.area(), 6));
+            //if not centered line :
+            //frame.render_widget(instructions, center_h(top_margin(frame.area(), 6), 60));
+
+            /*
             let area = center_h(
                 frame.area(),
                 //span.width buggy with unicode
@@ -44,6 +59,7 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
             );
             let area_instruct = top_margin(area, 5);
             frame.render_widget(span, area_instruct);
+            frame.render_widget(instructions, top_margin(area_instruct, 65));*/
         })
-        .unwrap();
+        .expect("Unusable terminal render");
 }
