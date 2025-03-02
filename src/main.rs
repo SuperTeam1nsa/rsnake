@@ -2,6 +2,7 @@
 #![deny(clippy::pedantic)]
 
 mod game;
+mod game_state;
 mod map;
 mod snake;
 mod utils;
@@ -24,7 +25,7 @@ fn main() {
     let speed: Speed = Speed::new(Velocity::Normal, 10);
     //if refacto: builder pattern possible (here we create the snake only once)
     let serpent: SnakeMoving = SnakeMoving::new(case_size, "❄️", "🎄", 10);
-    let mut jeu: Jeu = game::Game::new(speed, serpent, map, 14, terminal);
+    let mut jeu: Jeu = game::Game::new(speed, serpent, map, 10, terminal);
     jeu.start();
     ratatui::restore();
 }

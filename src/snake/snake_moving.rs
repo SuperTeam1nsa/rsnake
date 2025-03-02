@@ -1,3 +1,4 @@
+use crate::map::Map;
 use crate::snake::direction::Direction;
 use crate::snake::snake_body::SnakeBody;
 use ratatui::layout::Rect;
@@ -42,14 +43,23 @@ impl<'a> SnakeMoving<'a> {
     pub fn grow(&mut self) {
         //todo
     }
-    pub fn ramp(&mut self, direction: &Direction) -> Result<(u16, u16), ()> {
+    pub fn ramp(&mut self, direction: &Direction, carte: &Map) -> Result<(u16, u16), ()> {
         match direction {
             Direction::Up => self.body.up(),
             Direction::Down => self.body.down(),
             Direction::Left => self.body.left(),
             Direction::Right => self.body.right(),
         }
-        self.body.head_overlap()
+        if carte.out_of_map(self.body.body[0].x, self.body.body[0].y) {
+            let new_position =
+                carte.out_of_map_reverse_position(self.body.body[0].x, self.body.body[0].y);
+            self.body.body[0].x = new_position.0;
+            self.body.body[0].y = new_position.1;
+            //Err(())
+            Ok(new_position)
+        } else {
+            self.body.head_position_and_overlap()
+        }
     }
     pub fn get_widget(&self) -> impl Widget + 'a {
         self.body.clone()

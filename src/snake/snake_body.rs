@@ -1,10 +1,11 @@
+use crate::map::Map;
 use crate::snake::body_elements::BodyElement;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 
 #[derive(Clone)]
 pub struct SnakeBody<'a> {
-    body: Vec<BodyElement<'a>>,
+    pub(crate) body: Vec<BodyElement<'a>>,
     case_size: u16,
 }
 
@@ -27,8 +28,8 @@ impl<'a> SnakeBody<'a> {
         }
         b
     }
-    pub fn ramping_body(&mut self, head: (u16, u16)) {
-        let mut current = head;
+    pub fn ramping_body(&mut self, previous_head: (u16, u16)) {
+        let mut current = previous_head;
         let mut previous: (u16, u16) = current;
         for i in 1..self.body.len() {
             current = (self.body[i].x, self.body[i].y);
@@ -38,7 +39,7 @@ impl<'a> SnakeBody<'a> {
         }
     }
     // Check that our head does not touch a part of the body
-    pub fn head_overlap(&self) -> Result<(u16, u16), ()> {
+    pub fn head_position_and_overlap(&self) -> Result<(u16, u16), ()> {
         let head = (self.body[0].x, self.body[0].y);
         for BodyElement { x, y, .. } in self.body.iter().skip(1) {
             if *x == head.0 && *y == head.1 {

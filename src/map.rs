@@ -27,6 +27,26 @@ impl Map<'_> {
         let y_min = self.case_size / 2;
         x < x_min || x > x_max || y < y_min || y > y_max
     }
+    /*
+    If out of map, reverse
+     */
+    pub fn out_of_map_reverse_position(&self, x: u16, y: u16) -> (u16, u16) {
+        let x_max = self.viewport.width - self.case_size;
+        let y_max = self.viewport.height - (self.case_size / 2);
+        let x_min = self.case_size;
+        let y_min = self.case_size / 2;
+        if y > y_max {
+            (x, y_min)
+        } else if y < y_min {
+            (x, y_max)
+        } else if x > x_max {
+            (x_min, y)
+        } else if x < x_min {
+            (x_max, y)
+        } else {
+            (x, y)
+        }
+    }
     pub fn area(&self) -> &Rect {
         &self.viewport
     }

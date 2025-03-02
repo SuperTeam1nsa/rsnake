@@ -22,6 +22,11 @@ impl<'a> BodyElement<'a> {
 
 impl<'a> ratatui::prelude::Widget for BodyElement<'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        buf.set_span(area.x + self.x, area.y + self.y, &self.image, area.width);
+        //if we are outside of the area the lib will panic, so if windows is resize down,
+        // part of graphic won't be shown but game won't crash :) (wanted behaviour)
+        //and the refreshing loop will refresh up (resizing the affichage) as soon the windows resize
+        if area.y + self.y < area.height && area.x + self.x < area.width {
+            buf.set_span(area.x + self.x, area.y + self.y, &self.image, area.width);
+        }
     }
 }
