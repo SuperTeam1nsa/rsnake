@@ -18,6 +18,10 @@ impl<'a> BodyElement<'a> {
             image: Span::styled(image, Style::default().fg(Color::Cyan)),
         }
     }
+    pub fn set_position(&mut self, new_x: u16, new_y: u16) {
+        self.x = new_x;
+        self.y = new_y;
+    }
 }
 
 impl<'a> ratatui::prelude::Widget for BodyElement<'a> {

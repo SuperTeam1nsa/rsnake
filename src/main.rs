@@ -12,7 +12,8 @@ use snake::speed::{Speed, Velocity};
 use crate::game::Game as Jeu;
 
 use crate::map::Map as Carte;
-use snake::snake_moving::SnakeMoving;
+use crate::snake::snake_body::SnakeBody;
+
 fn main() {
     //exemple: https://ratatui.rs/examples/widgets/canvas/ (moche / moins bien que emoji)
     //can capture mouse in terminal
@@ -24,7 +25,7 @@ fn main() {
     let map: Carte = Carte::new(case_size, terminal.get_frame().area());
     let speed: Speed = Speed::new(Velocity::Normal, 10);
     //if refacto: builder pattern possible (here we create the snake only once)
-    let serpent: SnakeMoving = SnakeMoving::new(case_size, "❄️", "🎄", 10);
+    let serpent: SnakeBody = SnakeBody::new("❄️", "🎄", 10, 50, 5, case_size);
     let mut jeu: Jeu = game::Game::new(speed, serpent, map, 10, terminal);
     jeu.start();
     ratatui::restore();

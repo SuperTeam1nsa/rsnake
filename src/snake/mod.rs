@@ -6,7 +6,6 @@ use strum::IntoEnumIterator;
 pub mod body_elements;
 pub mod direction;
 pub mod snake_body;
-pub mod snake_moving;
 pub mod speed;
 
 /* Just to have some fun with moving letter

@@ -1,18 +1,20 @@
 use std::sync::{Arc, RwLock};
 
 // Regroupement des drapeaux (game state flags) dans une struct
+#[derive(Clone, Debug, PartialEq)]
 pub struct GameState {
     pub life: u16,
     pub score: u32,
     pub status: GameStatus,
     life_ini: u16,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum GameStatus {
     Paused,
     GameOver,
     ByeBye,
     Playing,
+    Restarting,
 }
 
 impl GameState {

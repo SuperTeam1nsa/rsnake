@@ -1,7 +1,7 @@
 use crate::game_state::{GameState, GameStatus};
 use crate::map::Map;
 use crate::snake::direction::Direction;
-use crate::snake::snake_moving::SnakeMoving;
+use crate::snake::snake_body::SnakeBody;
 use crate::snake::speed::Speed;
 use crate::utils;
 use crate::utils::greeting;
@@ -22,7 +22,7 @@ const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCod
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
 pub struct Game {
     speed: Speed,
-    serpent: Arc<RwLock<SnakeMoving<'static>>>,
+    serpent: Arc<RwLock<SnakeBody<'static>>>,
     direction: Arc<RwLock<Direction>>,
     //NB: if does not want to clone later, use only Arc<Map> (immuable)
     carte: Arc<Map<'static>>,
@@ -34,7 +34,7 @@ pub struct Game {
 impl Game {
     pub fn new(
         speed: Speed,
-        serpent: SnakeMoving<'static>,
+        serpent: SnakeBody<'static>,
         carte: Map<'static>,
         life: u16,
         terminal: DefaultTerminal,
@@ -50,7 +50,16 @@ impl Game {
     }
     pub fn render(&mut self) {
         let mut rendering_break = false;
+        let mut frame_count = 0f64;
+        let mut start_time = std::time::Instant::now();
         'render_loop: loop {
+            frame_count += 1.0;
+            //windows for frame calcul
+            if (frame_count >= 1_000.0) {
+                frame_count = 1.0;
+                start_time = std::time::Instant::now();
+            }
+            //
             //if self.serpent.read().unwrap().is_alive {
             //for text display: https://ratatui.rs/recipes/render/display-text/
             self.terminal
@@ -61,6 +70,13 @@ impl Game {
                     frame.render_widget(
                         Paragraph::new(format!(" Score: {} ", self.state.read().unwrap().score)),
                         Rect::new(20, 0, 15, 1),
+                    );
+                    frame.render_widget(
+                        Paragraph::new(format!(
+                            " Mean FPS: {} ",
+                            (frame_count / start_time.elapsed().as_secs_f64()).floor()
+                        )),
+                        Rect::new(120, 0, 25, 1),
                     );
                     //life
                     let life = self.state.read().unwrap().life as usize;
@@ -84,14 +100,20 @@ impl Game {
                             rendering_break = true;
                         }
                         GameStatus::Playing => (),
+                        GameStatus::Restarting => {
+                            frame.render_widget(utils::restart_paragraph(), frame.area());
+                        }
                     }
                 })
                 .expect("bad rendering, check sprites position");
             if rendering_break {
-                sleep(Duration::from_millis(2000));
+                //let time for user to see the farewell screen
+                sleep(Duration::from_millis(1000));
                 //nice labeled loop :)
                 break 'render_loop;
             }
+            //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
+            thread::sleep(Duration::from_millis(12));
         }
     }
     pub fn greeting(&mut self) -> bool {
@@ -137,38 +159,36 @@ impl Game {
         //In a scope to have auto cleaning by auto join at end of main thread
         thread::scope(|s| {
             // Game logic thread
-            s.spawn(move || {
-                game_logic_loop(&logic_dir, &logic_snake, &logic_gs, &carte, game_speed)
-            });
+            s.spawn(move || logic_loop(&logic_dir, &logic_snake, &logic_gs, &carte, game_speed));
             // input logic thread
             s.spawn(move || {
-                game_input_loop(&input_dir, &input_gs);
+                input_loop(&input_dir, &input_gs);
             });
             // Graphical thread (current so no shared variable)
             self.render();
         });
     }
 }
-pub fn game_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<GameState>>) {
+pub fn input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<GameState>>) {
     loop {
         if let Ok(event::Event::Key(key)) = event::read() {
             if key.kind == KeyEventKind::Press {
                 //PAUSE
                 if PAUSE_KEYS.contains(&key.code) {
                     let mut gs_guard = gs.write().unwrap();
-                    //to avoid to list all status or set a default one we use matches!
-                    gs_guard.status = if matches!(gs_guard.status, GameStatus::Paused) {
-                        GameStatus::Playing
-                    } else {
-                        GameStatus::Paused
-                    };
+                    //in others state does nothing to not break game logic
+                    if gs_guard.status == GameStatus::Playing {
+                        gs_guard.status = GameStatus::Paused;
+                    } else if gs_guard.status == GameStatus::Paused {
+                        gs_guard.status = GameStatus::Playing;
+                    }
                 //QUIT
                 } else if QUIT_KEYS.contains(&key.code) {
                     gs.write().unwrap().status = GameStatus::ByeBye;
                     break;
                 //RESTART
                 } else if RESET_KEYS.contains(&key.code) {
-                    gs.write().unwrap().reset();
+                    gs.write().unwrap().status = GameStatus::Restarting;
                 //Arrow input
                 } else {
                     let direction_input = match key.code {
@@ -186,35 +206,48 @@ pub fn game_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<GameS
         }
     }
 }
-pub fn game_logic_loop(
+pub fn logic_loop(
     direction: &Arc<RwLock<Direction>>,
-    snake: &Arc<RwLock<SnakeMoving>>,
+    snake: &Arc<RwLock<SnakeBody>>,
     gs: &Arc<RwLock<GameState>>,
     carte: &Arc<Map>,
     game_speed: u64,
 ) {
+    let mut gsc;
     loop {
+        //do not want to keep the lock for too long + cannot hold in same thread 2 time the same hold
+        // so match a clone, or use a let
+        gsc = gs.read().unwrap().status.clone();
         //dead snakes tell no tales, nor move :p
-        if gs.read().unwrap().status == GameStatus::Playing {
-            //Check if we have move without biting ourselves (Err), and getting head position after the move
-            if let Ok((x, y)) = snake
-                .write()
-                .unwrap()
-                .ramp(&direction.read().unwrap(), &carte)
-            {
-                //did we find out a fruit ?
-            } else {
-                //ouch bite ourselves ! Or go out of map
-                let mut state_guard = gs.write().unwrap();
-                if (state_guard.life) >= 1 {
-                    state_guard.life -= 1;
-                }
-                if state_guard.life == 0 {
-                    state_guard.status = GameStatus::GameOver;
+        match gsc {
+            GameStatus::Playing => {
+                //Check if we have move without biting ourselves (Err), and getting head position after the move
+                if let Ok((x, y)) = snake
+                    .write()
+                    .unwrap()
+                    .ramp(&direction.read().unwrap(), carte)
+                {
+                    //did we find out a fruit ?
+                } else {
+                    //ouch bite ourselves ! Or go out of map
+                    let mut state_guard = gs.write().unwrap();
+                    if (state_guard.life) >= 1 {
+                        state_guard.life -= 1;
+                    }
+                    if state_guard.life == 0 {
+                        state_guard.status = GameStatus::GameOver;
+                    }
                 }
             }
-        } else if gs.read().unwrap().status == GameStatus::ByeBye {
-            break;
+            GameStatus::Restarting => {
+                //let some time for restarting screen to appear
+                thread::sleep(Duration::from_millis(1000));
+                gs.write().unwrap().reset();
+                snake.write().unwrap().reset();
+                *direction.write().unwrap() = Direction::Left;
+            }
+            GameStatus::ByeBye => break,
+            _ => {}
         }
         sleep(Duration::from_millis(game_speed));
     }

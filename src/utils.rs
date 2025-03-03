@@ -27,6 +27,14 @@ const FAREWELL_TEXT: &str = "\n\
 ██╔══██╗  ╚██╔╝  ██╔══╝╚════╝██╔══██╗  ╚██╔╝  ██╔══╝  
 ██████╔╝   ██║   ███████╗    ██████╔╝   ██║   ███████╗
 ╚═════╝    ╚═╝   ╚══════╝    ╚═════╝    ╚═╝   ╚══════╝";
+
+const RESTART_TEXT: &str = "\n\
+██████╗ ███████╗███████╗████████╗ █████╗ ██████╗ ████████╗
+██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝
+██████╔╝█████╗  ███████╗   ██║   ███████║██████╔╝   ██║   
+██╔══██╗██╔══╝  ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   
+██║  ██║███████╗███████║   ██║   ██║  ██║██║  ██║   ██║   
+╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ";
 pub fn center_h(area: Rect, nb_of_max_char: u16) -> Rect {
     //, horizontal: Constraint
     let [area] = Layout::horizontal([Constraint::Length(nb_of_max_char)])
@@ -85,4 +93,7 @@ pub fn pause_paragraph() -> Paragraph<'static> {
 }
 pub fn byebye_paragraph() -> Paragraph<'static> {
     retro_paragraph(FAREWELL_TEXT, Color::DarkGray)
+}
+pub fn restart_paragraph() -> Paragraph<'static> {
+    retro_paragraph(RESTART_TEXT, Color::LightYellow)
 }
