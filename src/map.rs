@@ -20,7 +20,7 @@ impl Map<'_> {
             viewport,
         }
     }
-    pub fn out_of_map(&self, x: u16, y: u16) -> bool {
+    pub fn out_of_map(&self, (x, y): (u16, u16)) -> bool {
         let x_max = self.viewport.width - self.case_size;
         let y_max = self.viewport.height - (self.case_size / 2);
         let x_min = self.case_size;
@@ -30,7 +30,7 @@ impl Map<'_> {
     /*
     If out of map, reverse
      */
-    pub fn out_of_map_reverse_position(&self, x: u16, y: u16) -> (u16, u16) {
+    pub fn out_of_map_reverse_position(&self, (x, y): (u16, u16)) -> (u16, u16) {
         let x_max = self.viewport.width - self.case_size;
         let y_max = self.viewport.height - (self.case_size / 2);
         let x_min = self.case_size;

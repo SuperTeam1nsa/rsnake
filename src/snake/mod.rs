@@ -3,11 +3,11 @@ use ratatui::widgets::Widget;
 use std::cmp::PartialEq;
 use std::ops::Div;
 use strum::IntoEnumIterator;
-pub mod body_elements;
 pub mod direction;
+pub mod fruit;
+pub mod graphic_block;
 pub mod snake_body;
 pub mod speed;
-
 /* Just to have some fun with moving letter
 pub fn left(&mut self) {
         let mut current: u16 = self.body[0].x;

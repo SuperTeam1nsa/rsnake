@@ -66,11 +66,7 @@ impl Game {
                 .draw(|frame| {
                     //maps
                     frame.render_widget(self.carte.get_widget(), *self.carte.area());
-                    //score
-                    frame.render_widget(
-                        Paragraph::new(format!(" Score: {} ", self.state.read().unwrap().score)),
-                        Rect::new(20, 0, 15, 1),
-                    );
+                    //FPS
                     frame.render_widget(
                         Paragraph::new(format!(
                             " Mean FPS: {} ",
@@ -78,13 +74,22 @@ impl Game {
                         )),
                         Rect::new(120, 0, 25, 1),
                     );
-                    //life
-                    let life = self.state.read().unwrap().life as usize;
-                    frame.render_widget(
-                        Paragraph::new(format!(" life: {} ", "❤️ ".repeat(life))),
-                        #[allow(clippy::cast_possible_truncation)]
-                        Rect::new(40, 0, (7 * life) as u16, 1),
-                    );
+                    //sub scope to release the lock faster
+                    {
+                        let state_guard = self.state.read().unwrap();
+                        //score
+                        frame.render_widget(
+                            Paragraph::new(format!(" Score: {} ", state_guard.score)),
+                            Rect::new(20, 0, 15, 1),
+                        );
+                        //life
+                        let life = state_guard.life as usize;
+                        frame.render_widget(
+                            Paragraph::new(format!(" life: {} ", "❤️ ".repeat(life))),
+                            #[allow(clippy::cast_possible_truncation)]
+                            Rect::new(40, 0, (10 * life) as u16, 1),
+                        );
+                    }
                     //serpent //circle bad on not squared terminal => use emoji with position
                     frame.render_widget(self.serpent.read().unwrap().get_widget(), frame.area());
                     // And game status
@@ -228,6 +233,93 @@ pub fn logic_loop(
                     .ramp(&direction.read().unwrap(), carte)
                 {
                     //did we find out a fruit ?
+                    // FruitManager: Inspired by BodySnake, for managing fruits
+                    #[derive(Default)]
+                    pub struct FruitManager {
+                        fruits: Vec<Fruit>, // Current fruits on the map
+                    }
+
+                    impl FruitManager {
+                        // Create a new FruitManager
+                        pub fn new() -> Self {
+                            Self { fruits: Vec::new() }
+                        }
+
+                        // Add new fruit to the manager
+                        pub fn add_fruit(&mut self, fruit: Fruit) {
+                            self.fruits.push(fruit);
+                        }
+
+                        // Check and consume fruit at the given position (removes it if found)
+                        pub fn check_and_consume_fruit(
+                            &mut self,
+                            position: (u16, u16),
+                        ) -> Option<Fruit> {
+                            if let Some(index) = self
+                                .fruits
+                                .iter()
+                                .position(|fruit| fruit.position == position)
+                            {
+                                Some(self.fruits.remove(index))
+                            } else {
+                                None
+                            }
+                        }
+
+                        // Generate and add a fruit avoiding snake's body positions
+                        pub fn spawn_random_fruit(
+                            &mut self,
+                            width: u16,
+                            height: u16,
+                            snake_positions: &[(u16, u16)],
+                        ) {
+                            let fruit = Fruit::spawn_random(width, height, snake_positions);
+                            self.add_fruit(fruit);
+                        }
+
+                        // Get reference to current fruits
+                        pub fn get_fruits(&self) -> &Vec<Fruit> {
+                            &self.fruits
+                        }
+                    }
+
+                    #[derive(Clone)]
+                    pub struct Fruit {
+                        pub position: (u16, u16),
+                        pub points: u32, // Points awarded for consuming the fruit
+                    }
+
+                    impl Fruit {
+                        // Create a new fruit
+                        pub fn new(x: u16, y: u16, points: u32) -> Self {
+                            Self {
+                                position: (x, y),
+                                points,
+                            }
+                        }
+
+                        // Spawn a fruit at a random position avoiding the snake's body
+                        pub fn spawn_random(
+                            width: u16,
+                            height: u16,
+                            snake_positions: &[(u16, u16)],
+                        ) -> Self {
+                            use rand::Rng;
+                            let mut rng = rand::thread_rng();
+                            loop {
+                                let x = rng.gen_range(0..width);
+                                let y = rng.gen_range(0..height);
+                                if !snake_positions.contains(&(x, y)) {
+                                    return Self::new(x, y, 10); // Default point value: 10
+                                }
+                            }
+                        }
+
+                        // Check if this fruit is at a specific position
+                        pub fn is_at_position(&self, x: u16, y: u16) -> bool {
+                            self.position == (x, y)
+                        }
+                    }
                 } else {
                     //ouch bite ourselves ! Or go out of map
                     let mut state_guard = gs.write().unwrap();

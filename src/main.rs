@@ -25,8 +25,8 @@ fn main() {
     let map: Carte = Carte::new(case_size, terminal.get_frame().area());
     let speed: Speed = Speed::new(Velocity::Normal, 10);
     //if refacto: builder pattern possible (here we create the snake only once)
-    let serpent: SnakeBody = SnakeBody::new("❄️", "🎄", 10, 50, 5, case_size);
-    let mut jeu: Jeu = game::Game::new(speed, serpent, map, 10, terminal);
+    let serpent: SnakeBody = SnakeBody::new("❄️", "🎄", 3, 50, 5, case_size);
+    let mut jeu: Jeu = game::Game::new(speed, serpent, map, 3, terminal);
     jeu.start();
     ratatui::restore();
 }

@@ -1,13 +1,14 @@
 use crate::map::Map;
-use crate::snake::body_elements::BodyElement;
 use crate::snake::direction::Direction;
+use crate::snake::graphic_block::GraphicBlock;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
-use ratatui::prelude::Widget;
+use ratatui::prelude::{Style, Widget};
+use ratatui::style::Color;
 
 #[derive(Clone)]
 pub struct SnakeBody<'a> {
-    pub(crate) body: Vec<BodyElement<'a>>,
+    pub(crate) body: Vec<GraphicBlock<'a>>,
     case_size: u16,
     posi_ini: (u16, u16),
     size_ini: u16,
@@ -22,15 +23,20 @@ impl<'a> SnakeBody<'a> {
         y: u16,
         case_size: u16,
     ) -> SnakeBody<'a> {
+        let snake_style = Style::default().fg(Color::Cyan);
         let mut b = SnakeBody {
-            body: vec![BodyElement::new(x, y, head_image)], //🐍🐍 //🎄
+            body: vec![GraphicBlock::new(x, y, head_image, snake_style)], //🐍🐍 //🎄
             case_size,
             posi_ini: (x, y),
             size_ini: nb,
         };
         for i in 1..nb {
-            b.body
-                .push(BodyElement::new(x + (case_size * i), y, body_image));
+            b.body.push(GraphicBlock::new(
+                x + (case_size * i),
+                y,
+                body_image,
+                snake_style,
+            ));
         }
         b
     }
@@ -59,31 +65,33 @@ impl<'a> SnakeBody<'a> {
     }
     // Check that our head does not touch a part of the body
     pub fn head_position_and_overlap(&self) -> Result<(u16, u16), ()> {
-        let head = (self.body[0].x, self.body[0].y);
-        for BodyElement { x, y, .. } in self.body.iter().skip(1) {
-            if *x == head.0 && *y == head.1 {
+        let head = self.body[0].get_position();
+        //fancy
+        //for GraphicBlock { x, y, .. } in self.body.iter().skip(1) {
+        for b in self.body.iter().skip(1) {
+            if head == b.get_position() {
                 return Err(());
             }
         }
         Ok(head)
     }
     pub fn left(&mut self) {
-        let current = (self.body[0].x, self.body[0].y);
+        let current = self.body[0].get_position();
         self.body[0].x -= self.case_size;
         self.ramping_body(current);
     }
     pub fn right(&mut self) {
-        let current = (self.body[0].x, self.body[0].y);
+        let current = self.body[0].get_position();
         self.body[0].x += self.case_size;
         self.ramping_body(current);
     }
     pub fn up(&mut self) {
-        let current = (self.body[0].x, self.body[0].y);
+        let current = self.body[0].get_position();
         self.body[0].y -= self.case_size / 2;
         self.ramping_body(current);
     }
     pub fn down(&mut self) {
-        let current = (self.body[0].x, self.body[0].y);
+        let current = self.body[0].get_position();
         self.body[0].y += self.case_size / 2;
         self.ramping_body(current);
     }
@@ -94,8 +102,8 @@ impl<'a> SnakeBody<'a> {
             Direction::Left => self.left(),
             Direction::Right => self.right(),
         }
-        if carte.out_of_map(self.body[0].x, self.body[0].y) {
-            let new_position = carte.out_of_map_reverse_position(self.body[0].x, self.body[0].y);
+        if carte.out_of_map(self.body[0].get_position()) {
+            let new_position = carte.out_of_map_reverse_position(self.body[0].get_position());
             self.body[0].x = new_position.0;
             self.body[0].y = new_position.1;
             //Err(())

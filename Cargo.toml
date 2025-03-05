@@ -9,3 +9,4 @@ ratatui = "0.28.1"
 #To have enum toString and get their name
 strum = "0.26.3"
 strum_macros = "0.26.4"
+rand = "0.9.0"
