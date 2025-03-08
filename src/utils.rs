@@ -35,7 +35,7 @@ const RESTART_TEXT: &str = "\n\
 ██╔══██╗██╔══╝  ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   
 ██║  ██║███████╗███████║   ██║   ██║  ██║██║  ██║   ██║   
 ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ";
-pub fn center_h(area: Rect, nb_of_max_char: u16) -> Rect {
+/*pub fn center_h(area: Rect, nb_of_max_char: u16) -> Rect {
     //, horizontal: Constraint
     let [area] = Layout::horizontal([Constraint::Length(nb_of_max_char)])
         .flex(Flex::Center)
@@ -48,7 +48,7 @@ pub fn top_margin(area: Rect, marge: u16) -> Rect {
         .margin(marge)
         .areas(area);
     area
-}
+}*/
 pub fn greeting(terminal: &mut DefaultTerminal) {
     terminal.clear().expect("Unusable terminal clear");
     terminal

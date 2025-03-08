@@ -1,14 +1,15 @@
 use crate::game_state::{GameState, GameStatus};
 use crate::map::Map;
 use crate::snake::direction::Direction;
+use crate::snake::fruit::FruitsManager;
+use crate::snake::graphic_block::Position;
 use crate::snake::snake_body::SnakeBody;
 use crate::snake::speed::Speed;
 use crate::utils;
 use crate::utils::greeting;
 use crossterm::event;
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind};
+use crossterm::event::{KeyCode, KeyEventKind};
 use ratatui::layout::Rect;
-use ratatui::style::Modifier;
 use ratatui::widgets::Paragraph;
 use ratatui::DefaultTerminal;
 use std::cmp::PartialEq;
@@ -20,31 +21,35 @@ use std::{io, thread};
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
 const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
-pub struct Game {
+pub struct Game<'a, 'b, 'c> {
     speed: Speed,
-    serpent: Arc<RwLock<SnakeBody<'static>>>,
+    serpent: Arc<RwLock<SnakeBody<'c>>>,
     direction: Arc<RwLock<Direction>>,
     //NB: if does not want to clone later, use only Arc<Map> (immuable)
-    carte: Arc<Map<'static>>,
+    carte: Arc<Map<'b>>,
     // states and game metrics (life etc.)
     state: Arc<RwLock<GameState>>,
+    //Fruits
+    fruits_manager: Arc<RwLock<FruitsManager<'a, 'b>>>,
     terminal: DefaultTerminal,
 }
 
-impl Game {
+impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
     pub fn new(
         speed: Speed,
         serpent: SnakeBody<'static>,
         carte: Map<'static>,
         life: u16,
         terminal: DefaultTerminal,
-    ) -> Game {
+    ) -> Game<'a, 'b, 'c> {
+        let arc_carte = Arc::new(carte);
         Game {
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
             direction: Arc::new(RwLock::new(Direction::Left)),
-            carte: Arc::new(carte),
+            carte: arc_carte.clone(),
             state: Arc::new(RwLock::new(GameState::new(life))),
+            fruits_manager: Arc::new(RwLock::new(FruitsManager::new(0, arc_carte.clone()))),
             terminal,
         }
     }
@@ -118,7 +123,7 @@ impl Game {
                 break 'render_loop;
             }
             //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            thread::sleep(Duration::from_millis(12));
+            //thread::sleep(Duration::from_millis(12));
         }
     }
     pub fn greeting(&mut self) -> bool {
@@ -153,6 +158,7 @@ impl Game {
         let logic_gs = Arc::clone(&self.state);
         let logic_dir = Arc::clone(&self.direction);
         let carte = Arc::clone(&self.carte);
+        let fruits_manager = Arc::clone(&self.fruits_manager);
 
         // For input management thread
         let input_gs = Arc::clone(&self.state);
@@ -164,7 +170,16 @@ impl Game {
         //In a scope to have auto cleaning by auto join at end of main thread
         thread::scope(|s| {
             // Game logic thread
-            s.spawn(move || logic_loop(&logic_dir, &logic_snake, &logic_gs, &carte, game_speed));
+            s.spawn(move || {
+                logic_loop(
+                    &logic_dir,
+                    &logic_snake,
+                    &logic_gs,
+                    &carte,
+                    &fruits_manager,
+                    game_speed,
+                )
+            });
             // input logic thread
             s.spawn(move || {
                 input_loop(&input_dir, &input_gs);
@@ -216,6 +231,7 @@ pub fn logic_loop(
     snake: &Arc<RwLock<SnakeBody>>,
     gs: &Arc<RwLock<GameState>>,
     carte: &Arc<Map>,
+    fruits_manager: &Arc<RwLock<FruitsManager>>,
     game_speed: u64,
 ) {
     let mut gsc;
@@ -227,99 +243,14 @@ pub fn logic_loop(
         match gsc {
             GameStatus::Playing => {
                 //Check if we have move without biting ourselves (Err), and getting head position after the move
-                if let Ok((x, y)) = snake
+                if let Ok(position) = snake
                     .write()
                     .unwrap()
                     .ramp(&direction.read().unwrap(), carte)
                 {
+                    //fruits_manager.read().
                     //did we find out a fruit ?
                     // FruitManager: Inspired by BodySnake, for managing fruits
-                    #[derive(Default)]
-                    pub struct FruitManager {
-                        fruits: Vec<Fruit>, // Current fruits on the map
-                    }
-
-                    impl FruitManager {
-                        // Create a new FruitManager
-                        pub fn new() -> Self {
-                            Self { fruits: Vec::new() }
-                        }
-
-                        // Add new fruit to the manager
-                        pub fn add_fruit(&mut self, fruit: Fruit) {
-                            self.fruits.push(fruit);
-                        }
-
-                        // Check and consume fruit at the given position (removes it if found)
-                        pub fn check_and_consume_fruit(
-                            &mut self,
-                            position: (u16, u16),
-                        ) -> Option<Fruit> {
-                            if let Some(index) = self
-                                .fruits
-                                .iter()
-                                .position(|fruit| fruit.position == position)
-                            {
-                                Some(self.fruits.remove(index))
-                            } else {
-                                None
-                            }
-                        }
-
-                        // Generate and add a fruit avoiding snake's body positions
-                        pub fn spawn_random_fruit(
-                            &mut self,
-                            width: u16,
-                            height: u16,
-                            snake_positions: &[(u16, u16)],
-                        ) {
-                            let fruit = Fruit::spawn_random(width, height, snake_positions);
-                            self.add_fruit(fruit);
-                        }
-
-                        // Get reference to current fruits
-                        pub fn get_fruits(&self) -> &Vec<Fruit> {
-                            &self.fruits
-                        }
-                    }
-
-                    #[derive(Clone)]
-                    pub struct Fruit {
-                        pub position: (u16, u16),
-                        pub points: u32, // Points awarded for consuming the fruit
-                    }
-
-                    impl Fruit {
-                        // Create a new fruit
-                        pub fn new(x: u16, y: u16, points: u32) -> Self {
-                            Self {
-                                position: (x, y),
-                                points,
-                            }
-                        }
-
-                        // Spawn a fruit at a random position avoiding the snake's body
-                        pub fn spawn_random(
-                            width: u16,
-                            height: u16,
-                            snake_positions: &[(u16, u16)],
-                        ) -> Self {
-                            use rand::Rng;
-                            let mut rng = rand::thread_rng();
-                            loop {
-                                let x = rng.gen_range(0..width);
-                                let y = rng.gen_range(0..height);
-                                if !snake_positions.contains(&(x, y)) {
-                                    return Self::new(x, y, 10); // Default point value: 10
-                                }
-                            }
-                        }
-
-                        // Check if this fruit is at a specific position
-                        pub fn is_at_position(&self, x: u16, y: u16) -> bool {
-                            self.position == (x, y)
-                        }
-                    }
                 } else {
                     //ouch bite ourselves ! Or go out of map
                     let mut state_guard = gs.write().unwrap();
