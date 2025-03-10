@@ -1,12 +1,10 @@
 [package]
 name = "rsnake"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 crossterm = "0.28.1"
-ratatui = "0.28.1"
-#To have enum toString and get their name
-strum = "0.26.3"
-strum_macros = "0.26.4"
+#see https://docs.rs/ratatui/latest/ratatui/widgets/trait.WidgetRef.html need to have better performance avoiding cloning widget each time
+ratatui = { version = "0.29", features = ["unstable-widget-ref"] }
 rand = "0.9.0"

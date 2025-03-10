@@ -1,55 +1,57 @@
-use crate::game_state::{GameState, GameStatus};
-use crate::map::Map;
-use crate::snake::direction::Direction;
-use crate::snake::fruit::FruitsManager;
-use crate::snake::graphic_block::Position;
-use crate::snake::snake_body::SnakeBody;
-use crate::snake::speed::Speed;
-use crate::utils;
-use crate::utils::greeting;
+use crate::controls::direction::Direction;
+use crate::controls::fruits_manager::FruitsManager;
+use crate::controls::game_state::{GameState, GameStatus};
+use crate::controls::speed::Speed;
+use crate::graphics::map::Map;
+use crate::graphics::snake_body::SnakeBody;
+use crate::graphics::utils;
+use crate::graphics::utils::greeting;
 use crossterm::event;
 use crossterm::event::{KeyCode, KeyEventKind};
+use ratatui::DefaultTerminal;
 use ratatui::layout::Rect;
 use ratatui::widgets::Paragraph;
-use ratatui::DefaultTerminal;
-use std::cmp::PartialEq;
 use std::sync::{Arc, RwLock};
+use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
-use std::{io, thread};
 
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
 const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
 pub struct Game<'a, 'b, 'c> {
     speed: Speed,
-    serpent: Arc<RwLock<SnakeBody<'c>>>,
+    serpent: Arc<RwLock<SnakeBody<'a>>>,
     direction: Arc<RwLock<Direction>>,
     //NB: if does not want to clone later, use only Arc<Map> (immuable)
     carte: Arc<Map<'b>>,
     // states and game metrics (life etc.)
     state: Arc<RwLock<GameState>>,
     //Fruits
-    fruits_manager: Arc<RwLock<FruitsManager<'a, 'b>>>,
+    fruits_manager: Arc<RwLock<FruitsManager<'c, 'b>>>,
     terminal: DefaultTerminal,
 }
 
-impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
+impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     pub fn new(
         speed: Speed,
-        serpent: SnakeBody<'static>,
-        carte: Map<'static>,
+        serpent: SnakeBody<'a>,
+        carte: Map<'b>,
         life: u16,
+        fruits_nb: u16,
         terminal: DefaultTerminal,
     ) -> Game<'a, 'b, 'c> {
         let arc_carte = Arc::new(carte);
         Game {
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
-            direction: Arc::new(RwLock::new(Direction::Left)),
+            direction: Arc::new(RwLock::new(Direction::Right)),
             carte: arc_carte.clone(),
             state: Arc::new(RwLock::new(GameState::new(life))),
-            fruits_manager: Arc::new(RwLock::new(FruitsManager::new(0, arc_carte.clone()))),
+            fruits_manager: Arc::new(RwLock::new(FruitsManager::new(
+                fruits_nb,
+                arc_carte.clone(),
+            ))),
             terminal,
         }
     }
@@ -60,7 +62,7 @@ impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
         'render_loop: loop {
             frame_count += 1.0;
             //windows for frame calcul
-            if (frame_count >= 1_000.0) {
+            if frame_count >= 1_000.0 {
                 frame_count = 1.0;
                 start_time = std::time::Instant::now();
             }
@@ -96,7 +98,16 @@ impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
                         );
                     }
                     //serpent //circle bad on not squared terminal => use emoji with position
-                    frame.render_widget(self.serpent.read().unwrap().get_widget(), frame.area());
+                    {
+                        //NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        let snake_read = self.serpent.read().unwrap(); // Read lock
+                        frame.render_widget(&*snake_read, frame.area());
+                    }
+                    {
+                        //NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        let fruits_manager_read = self.fruits_manager.read().unwrap(); // Read lock
+                        frame.render_widget(&*fruits_manager_read, frame.area());
+                    }
                     // And game status
                     match self.state.read().unwrap().status {
                         GameStatus::Paused => {
@@ -147,11 +158,11 @@ impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
         true
     }
     pub fn start(&mut self) {
-        //except if gamer wanna quit from menu screen we continue
+        //except if gamer want to quit from menu screen we continue
         if !self.greeting() {
             return;
         }
-        // be careful not all thread on snake or same structure and do not keep them too much => deadlock otherwise
+        // be careful not all thread on graphics or same structure and do not keep them too much => deadlock otherwise
         // Prepare thread use of variable
         //For logical thread
         let logic_snake = Arc::clone(&self.serpent);
@@ -178,7 +189,7 @@ impl<'c, 'a, 'b> Game<'a, 'b, 'c> {
                     &carte,
                     &fruits_manager,
                     game_speed,
-                )
+                );
             });
             // input logic thread
             s.spawn(move || {
@@ -248,11 +259,28 @@ pub fn logic_loop(
                     .unwrap()
                     .ramp(&direction.read().unwrap(), carte)
                 {
-                    //fruits_manager.read().
-                    //did we find out a fruit ?
-                    // FruitManager: Inspired by BodySnake, for managing fruits
+                    //In two steps to leverage the power of multiple read in // whereas we have only one write
+                    let fruits = fruits_manager.read().unwrap().eat_some_fruits(position);
+                    if let Some(fruits) = fruits {
+                        let score_fruits = fruits
+                            .iter()
+                            .map(super::graphics::fruit::Fruit::get_score)
+                            .sum::<i32>();
+                        ///TODO
+                        if score_fruits >= 0 {
+
+                            /*snake
+                            .write()
+                            .unwrap()
+                            .grow(u16::try_from(score_fruits).unwrap());*/
+                        }
+                        gs.write().unwrap().score += score_fruits;
+                        fruits_manager.write().unwrap().replace_fruits(&fruits);
+                    }
+                    //did you find out a fruit ?
+                    // FruitManager:Inspired by BodySnake, for managing fruits
                 } else {
-                    //ouch bite ourselves ! Or go out of map
+                    //Ouch. You bite yourself
                     let mut state_guard = gs.write().unwrap();
                     if (state_guard.life) >= 1 {
                         state_guard.life -= 1;
@@ -263,8 +291,8 @@ pub fn logic_loop(
                 }
             }
             GameStatus::Restarting => {
-                //let some time for restarting screen to appear
-                thread::sleep(Duration::from_millis(1000));
+                //let some time for the restarting screen to appear
+                sleep(Duration::from_millis(1000));
                 gs.write().unwrap().reset();
                 snake.write().unwrap().reset();
                 *direction.write().unwrap() = Direction::Left;

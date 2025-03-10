@@ -1,6 +1,5 @@
-use ratatui::layout::{Constraint, Flex, Layout, Rect};
-use ratatui::style::{Color, Modifier, Style, Stylize};
-use ratatui::text::{Line, Span, Text};
+use ratatui::style::{Color, Style, Stylize};
+use ratatui::text::{Line, Text};
 use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::DefaultTerminal;
 // /Use AI or a generator as : http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Pause
@@ -50,7 +49,7 @@ pub fn top_margin(area: Rect, marge: u16) -> Rect {
     area
 }*/
 pub fn greeting(terminal: &mut DefaultTerminal) {
-    terminal.clear().expect("Unusable terminal clear");
+    //terminal.clear().expect("Unusable terminal clear");
     terminal
         .draw(|frame| {
             //more idiomatic using lines (as in :https://ratatui.rs/recipes/render/display-text/)
@@ -63,11 +62,8 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
                 Line::from("███████║ ██║ ╚████║ ██║  ██║ ██║  ██╗ ███████╗"),
                 Line::from("╚══════╝ ╚══════╝╚═ ╝  ╚═══╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝"),
                 Line::from("Welcome to the craziest Snake ever! 🐍").green(),
-                Line::from(
-                    "Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit in game ❌  ",
-                )
-                .bold()
-                .green(),
+                Line::from("Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit in game 🎮")
+                    .green(),
             ]);
             frame.render_widget(
                 Paragraph::new(text)
@@ -82,7 +78,7 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
 /// Creates a centered paragraph with text and color style
 fn retro_paragraph(text: &'static str, color: Color) -> Paragraph<'static> {
     Paragraph::new(text)
-        .style(Style::default().fg(color).add_modifier(Modifier::BOLD))
+        .style(Style::default().fg(color))
         .alignment(ratatui::layout::Alignment::Center)
 }
 pub fn game_over_paragraph() -> Paragraph<'static> {
