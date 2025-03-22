@@ -172,15 +172,26 @@ impl<'a> SnakeBody<'a> {
         self.clone()
     }
 
-    /// Grows the snake by adding a specified number of segments to its body.
+    /// Change the snake size by adding/removing a specified number of segments to its body.
     ///
     /// # Parameters
-    /// - `nb`: The number of segments to add to the snake's body.
-    pub fn grow(&mut self, nb: u16) {
-        for _ in 0..nb {
-            let mut block_to_add = self.body.last().unwrap().clone();
-            block_to_add.position.x -= self.case_size;
-            self.body.push(block_to_add);
+    /// - `nb`:The number of segments to add or to remove to the snake's body.
+    pub fn relative_size_change(&mut self, nb: i16) {
+        if nb > 0 {
+            for _ in 0..nb {
+                let mut block_to_add = self.body.last().unwrap().clone();
+                block_to_add.position.x += self.case_size;
+                self.body.push(block_to_add);
+            }
+        } else {
+            //We must remove some element, but keeping a minimum length for the snake
+            let sub = self.body.len().saturating_sub((-nb) as usize);
+            let to_keep = if sub < self.size_ini as usize {
+                self.size_ini as usize
+            } else {
+                sub
+            };
+            self.body.truncate(to_keep);
         }
     }
 }

@@ -22,11 +22,11 @@
 //! ```
 //!
 
-use crate::graphics::fruit::{FRUITS_SCORES_PROBABILITIES, Fruit};
+use crate::graphics::fruit::{Fruit, FRUITS_SCORES_PROBABILITIES};
 use crate::graphics::graphic_block::Position;
 use crate::graphics::map::Map;
 use rand::prelude::ThreadRng;
-use rand::{Rng, rng};
+use rand::{rng, Rng};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::prelude::Widget;
@@ -55,14 +55,15 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
         let position = Self::generate_position_rounded_by_cs(carte, &mut rng);
         let random_value: u16 = rng.random_range(1..100);
         let mut cumulative_probability = 0;
-        for &(image, score, probability) in FRUITS_SCORES_PROBABILITIES {
+        for &(image, score, probability, size_effect) in FRUITS_SCORES_PROBABILITIES {
             cumulative_probability += probability;
             if random_value <= cumulative_probability {
-                return Fruit::new(score, position, image);
+                return Fruit::new(score, size_effect, position, image);
             }
         }
         // Default fallback fruit
-        Fruit::new(10, position, "🍎")
+        let (image, score, _, size_effect) = FRUITS_SCORES_PROBABILITIES[0];
+        Fruit::new(score, size_effect, position, image)
     }
 
     /// Replaces eaten fruits with new random ones and ensures balance.

@@ -5,9 +5,9 @@ mod controls;
 mod game;
 mod graphics;
 
-use controls::speed::Speed;
 // inspiration: https://ratatui.rs/tutorials/hello-world/
 use crate::game::Game as Jeu;
+use controls::speed::Speed;
 
 use crate::controls::speed::Velocity;
 use crate::graphics::graphic_block::Position;
@@ -16,11 +16,11 @@ use graphics::map::Map as Carte;
 
 ///TODO: clap to get parameters from cmdline
 /// test integrated for proba & test integration
-/// cargo doc --document-private-items --no-deps
+/// cargo doc --document-private-items --no-deps --open
 /// Edge case and head position management
 /// Calculate 60 FPS more accurately (timer in and out)
 /// Refactoring, extract 3 mains loop each in one file
-/// Refactoring case_size (often 2 to render emoji) to case_width and case height(often 1 as each line)
+/// Refactoring `case_size` (often 2 to render emoji) to `case_width` and case height(often 1 as each line)
 fn main() {
     //exemple: https://ratatui.rs/examples/widgets/canvas/ (moche / moins bien que emoji)
     //can capture mouse in terminal

@@ -1,10 +1,10 @@
-/// This module contains the core components of the game. It includes the following sub-modules:
-///
-/// - [`fruit`]: Represents the fruit element, including its position, score, and image.
-/// - [`graphic_block`]: Handles the graphical rendering of game blocks in terminal.
-/// - [`map`]: Manages the game map, layout, and boundaries.
-/// - [`snake_body`]: Tracks and manages the snake's body and its movement.
-/// - [`utils`]: Provides utility functions to assist with common texts and graphical tasks
+//! This module contains the core components of the game. It includes the following sub-modules:
+//!
+//! - [`fruit`]: Represents the fruit element, including its position, score, and image.
+//! - [`graphic_block`]: Handles the graphical rendering of game blocks in terminal.
+//! - [`map`]: Manages the game map, layout, and boundaries.
+//! - [`snake_body`]: Tracks and manages the snake's body and its movement.
+//! - [`utils`]: Provides utility functions to assist with common texts and graphical tasks
 pub mod fruit;
 
 pub mod graphic_block;

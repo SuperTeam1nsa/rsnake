@@ -8,9 +8,9 @@ use crate::graphics::utils;
 use crate::graphics::utils::greeting;
 use crossterm::event;
 use crossterm::event::{KeyCode, KeyEventKind};
-use ratatui::DefaultTerminal;
 use ratatui::layout::Rect;
 use ratatui::widgets::Paragraph;
+use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
 use std::thread;
 use std::thread::sleep;
@@ -254,11 +254,9 @@ pub fn logic_loop(
         match gsc {
             GameStatus::Playing => {
                 //Check if we have move without biting ourselves (Err), and getting head position after the move
-                if let Ok(position) = snake
-                    .write()
-                    .unwrap()
-                    .ramp(&direction.read().unwrap(), carte)
-                {
+                let mut write_guard = snake.write().unwrap();
+                let movement = write_guard.ramp(&direction.read().unwrap(), carte);
+                if let Ok(position) = movement {
                     //In two steps to leverage the power of multiple read in // whereas we have only one write
                     let fruits = fruits_manager.read().unwrap().eat_some_fruits(position);
                     if let Some(fruits) = fruits {
@@ -266,13 +264,12 @@ pub fn logic_loop(
                             .iter()
                             .map(super::graphics::fruit::Fruit::get_score)
                             .sum::<i32>();
-                        ///TODO
+                        let size_effect = fruits
+                            .iter()
+                            .map(super::graphics::fruit::Fruit::get_size_effect)
+                            .sum::<i16>();
                         if score_fruits >= 0 {
-
-                            /*snake
-                            .write()
-                            .unwrap()
-                            .grow(u16::try_from(score_fruits).unwrap());*/
+                            write_guard.relative_size_change(size_effect);
                         }
                         gs.write().unwrap().score += score_fruits;
                         fruits_manager.write().unwrap().replace_fruits(&fruits);

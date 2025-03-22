@@ -23,18 +23,20 @@ use ratatui::style::Style;
 use ratatui::widgets::WidgetRef;
 
 /// Distribution statistics with weighted lottery / pie chart parts.
-pub const FRUITS_SCORES_PROBABILITIES: &[(&str, i32, u16)] = &[
-    ("🍇", 5, 5),
-    ("🍉", 10, 15),
-    ("🍋", 15, 10),
-    ("🍌", 20, 15),
-    ("🍐", 30, 10),
-    ("🍎", 40, 10),
-    ("🥝", 50, 10),
-    ("🍓", 60, 5),
-    ("🍒", 70, 5),
-    ("🥥", 0, 5),
-    ("🦞", -10, 5),
+/// image, score, probability, size effect
+///
+pub const FRUITS_SCORES_PROBABILITIES: &[(&str, i32, u16, i16)] = &[
+    ("🍇", 5, 5, 0),
+    ("🍉", 10, 15, 0),
+    ("🍋", 15, 10, 10),
+    ("🍌", 20, 15, 10),
+    ("🍐", 30, 10, 10),
+    ("🍎", 40, 10, 15),
+    ("🥝", 50, 10, 15),
+    ("🍓", 60, 5, 15),
+    ("🍒", 70, 5, 20),
+    ("🥥", 0, 5, -20),
+    ("🦞", -10, 5, -100),
 ];
 
 /// Represents a fruit on the map.
@@ -42,14 +44,16 @@ pub const FRUITS_SCORES_PROBABILITIES: &[(&str, i32, u16)] = &[
 #[derive(PartialEq, Debug, Clone)]
 pub struct Fruit<'a> {
     score: i32,
+    size_effect: i16,
     graphic_block: GraphicBlock<'a>,
 }
 
 impl<'a> Fruit<'a> {
     /// Creates a new `Fruit` at a given position with an associated score and image.
-    pub fn new(score: i32, position: Position, image: &'a str) -> Fruit<'a> {
+    pub fn new(score: i32, size_effect: i16, position: Position, image: &'a str) -> Fruit<'a> {
         Self {
             score,
+            size_effect,
             graphic_block: GraphicBlock::new(position, image, Style::default()),
         }
     }
@@ -62,6 +66,9 @@ impl<'a> Fruit<'a> {
     /// Returns the score of the fruit.
     pub fn get_score(&self) -> i32 {
         self.score
+    }
+    pub fn get_size_effect(&self) -> i16 {
+        self.size_effect
     }
 }
 

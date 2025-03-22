@@ -48,6 +48,7 @@ pub fn top_margin(area: Rect, marge: u16) -> Rect {
         .areas(area);
     area
 }*/
+
 pub fn greeting(terminal: &mut DefaultTerminal) {
     //terminal.clear().expect("Unusable terminal clear");
     terminal
