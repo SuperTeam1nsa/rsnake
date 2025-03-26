@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["fruit","graphic_block","map","snake_body","utils"]};

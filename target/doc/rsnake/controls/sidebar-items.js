@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["direction","fruits_manager","game_state","speed"]};

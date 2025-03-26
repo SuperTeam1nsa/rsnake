@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FAREWELL_TEXT","GAME_OVER_TEXT","PAUSE_TEXT","RESTART_TEXT"],"fn":["byebye_paragraph","game_over_paragraph","greeting","pause_paragraph","restart_paragraph","retro_paragraph"]};
