@@ -101,7 +101,7 @@ impl<'a> SnakeBody<'a> {
     /// Checks if the snake's head overlaps with any part of its body.
     ///
     /// # Returns
-    /// - `Ok(&Position)` if the head doesn't overlap with the body.
+    /// - `Ok(&Position)` if the head does not overlap with the body.
     /// - `Err(())` if the head overlaps with any part of the body.
     pub fn head_position_and_overlap(&self) -> Result<&Position, ()> {
         let head = self.body[0].get_position();
@@ -151,6 +151,7 @@ impl<'a> SnakeBody<'a> {
     /// # Returns
     /// - `Ok(&Position)` if the snake's head does not overlap with its body and is within the map.
     /// - `Err(())` if the snake's head overlaps with its body.
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn ramp(&mut self, direction: &Direction, carte: &Map) -> Result<&Position, ()> {
         match direction {
             Direction::Up => self.up(),
@@ -185,6 +186,7 @@ impl<'a> SnakeBody<'a> {
             }
         } else {
             //We must remove some element, but keeping a minimum length for the snake
+            #[allow(clippy::cast_sign_loss)]
             let sub = self.body.len().saturating_sub((-nb) as usize);
             let to_keep = if sub < self.size_ini as usize {
                 self.size_ini as usize
@@ -202,8 +204,21 @@ impl Widget for SnakeBody<'_> {
         self.render_ref(area, buf);
     }
 }
-//In general where you expect a widget to immutably work on its data, we recommended to implement Widget for a reference to the widget (impl Widget for &MyWidget). If you need to store state between draw calls, implement StatefulWidget if you want the Widget to be immutable, or implement Widget for a mutable reference to the widget (impl Widget for &mut MyWidget) if you want the widget to be mutable. The mutable widget pattern is used infrequently in apps, but can be quite useful.
-// A blanket implementation of Widget for &W where W implements WidgetRef is provided. Widget is also implemented for &str and String types.
+impl Widget for &SnakeBody<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        self.render_ref(area, buf);
+    }
+}
+//In general, where you expect a widget to immutably work on its data,we recommended implementing
+// Widget for a reference to the widget (impl Widget for &MyWidget).
+// If you need to store state between draw calls, implement StatefulWidget if you want the Widget
+// to be immutable,
+// or implement Widget for a mutable reference to the widget (impl Widget for &mut MyWidget).
+// If you want the widget to be mutable.
+// The mutable widget pattern is used infrequently in apps
+// but can be quite useful.
+// A blanket implementation of Widget for &W where W implements WidgetRef is provided.
+// The Widget trait is also implemented for &str and String types.
 
 impl WidgetRef for SnakeBody<'_> {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {

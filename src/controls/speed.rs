@@ -11,6 +11,9 @@
 //! ```
 //!
 
+use clap::ValueEnum;
+use std::str::FromStr;
+
 /// Represents a speed entry with a name and a value.
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct Speed {
@@ -48,9 +51,25 @@ impl Speed {
 }
 
 /// Represents possible velocity levels.
+#[derive(Debug, Clone, ValueEnum)]
 pub enum Velocity {
     Slow,
     Normal,
     Fast,
     Tremendous,
 }
+/* Auto managed by clap, no manual implementation need
+impl FromStr for Velocity {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "slow" => Ok(Velocity::Slow),
+            "normal" => Ok(Velocity::Normal),
+            "fast" => Ok(Velocity::Fast),
+            "tremendous" => Ok(Velocity::Tremendous),
+            _ => Err(format!("Invalid velocity: {s}")),
+        }
+    }
+}
+*/

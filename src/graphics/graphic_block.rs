@@ -9,6 +9,7 @@ use ratatui::layout::Rect;
 use ratatui::prelude::{Span, Style};
 use ratatui::widgets::{Widget, WidgetRef};
 
+
 /// A struct representing a graphical block that can be displayed in the game.
 /// It holds the position and visual representation (image) of the block.
 ///
@@ -72,7 +73,8 @@ impl<'a> GraphicBlock<'a> {
         &self.position
     }
 }
-
+///NB: Could also have used impl Widget for &T even if more limited
+/// see:https://github.com/ratatui/ratatui/discussions/1274
 impl WidgetRef for GraphicBlock<'_> {
     /// Renders the graphic block into the given buffer.
     ///

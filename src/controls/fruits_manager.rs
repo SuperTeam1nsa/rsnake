@@ -129,3 +129,9 @@ impl<'a> Widget for FruitsManager<'a, 'a> {
         self.render_ref(area, buf);
     }
 }
+
+impl<'a> Widget for &FruitsManager<'a, 'a> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        self.render_ref(area, buf);
+    }
+}
