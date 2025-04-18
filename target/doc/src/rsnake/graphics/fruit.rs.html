@@ -85,7 +85,17 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruit Management Module
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruit Management Module
 //!
 //! This module defines the `Fruit` struct, which represents different fruits in the game and provides the
 //!  ability to create, position, and render them.
@@ -94,10 +104,11 @@
 //!
 //! # Example
 //! ```rust
-//! use game::graphics::fruit::{Fruit, Position};
+//! use rsnake::graphics::fruit::Fruit;
+//! use rsnake::graphics::graphic_block::Position;
 //!
 //! let position = Position { x: 5, y: 10 };
-//! let apple = Fruit::new(40, position, "🍎");
+//! let apple = Fruit::new(40, 2,position, "🍎");
 //! assert_eq!(apple.get_score(), 40);
 //! ```
 //!
@@ -131,31 +142,40 @@
 </span><span class="attr">#[derive(PartialEq, Debug, Clone)]
 </span><span class="kw">pub struct </span>Fruit&lt;<span class="lifetime">'a</span>&gt; {
     score: i32,
-    size_effect: i16,
+    grow_snake: i16,
     graphic_block: GraphicBlock&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Fruit&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new `Fruit` at a given position with an associated score and image.
-    </span><span class="kw">pub fn </span>new(score: i32, size_effect: i16, position: Position, image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Fruit&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>new(
+        score: i32,
+        grow_snake_by_relative_nb: i16,
+        position: Position,
+        image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    ) -&gt; Fruit&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">Self </span>{
             score,
-            size_effect,
+            grow_snake: grow_snake_by_relative_nb,
             graphic_block: GraphicBlock::new(position, image, Style::default()),
         }
     }
 
     <span class="doccomment">/// Checks if the fruit is at a specific position.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: <span class="kw-2">&amp;</span>Position) -&gt; bool {
         <span class="self">self</span>.graphic_block.get_position() == position
     }
 
     <span class="doccomment">/// Returns the score of the fruit.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>get_score(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
         <span class="self">self</span>.score
     }
-    <span class="kw">pub fn </span>get_size_effect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
-        <span class="self">self</span>.size_effect
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>get_grow_snake(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+        <span class="self">self</span>.grow_snake
     }
 }
 

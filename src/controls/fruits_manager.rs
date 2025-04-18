@@ -5,11 +5,14 @@
 //!
 //! # Example
 //! ```rust
-//! use game::FruitsManager;
+//! use rsnake::game::FruitsManager;
+//! use rsnake::graphics::map::Map;
 //! use std::sync::Arc;
+//! use ratatui::layout::Rect;
+//! use rsnake::graphics::graphic_block::Position;
 //!
 //! let case_size = 2;
-//! let map_size = Rect::new(0, 0, 200, 10)
+//! let map_size = Rect::new(0, 0, 200, 10);
 //! let map = Arc::new(Map::new(case_size, map_size));
 //! let number_of_fruits_to_manage = 10;
 //! let mut manager = FruitsManager::new(number_of_fruits_to_manage, map.clone());
@@ -41,6 +44,18 @@ pub struct FruitsManager<'a, 'b: 'a> {
 
 impl<'a, 'b> FruitsManager<'a, 'b> {
     /// Creates a new `FruitsManager` with a given number of fruits.
+    ///
+    /// # Example
+    /// ```
+    /// use std::sync::Arc;
+    /// use ratatui::layout::Rect;
+    /// use rsnake::game::FruitsManager;
+    /// use rsnake::graphics::map::Map;
+    /// let x =42;
+    /// let map = Arc::new(Map::new(2, Rect::new(0,0, 160,10)));
+    /// let manager = FruitsManager::new(3, map);
+    /// ```
+    #[must_use]
     pub fn new(nb: u16, carte: Arc<Map<'b>>) -> Self {
         let mut fruits: Vec<Fruit> = Vec::with_capacity(nb as usize);
         for _ in 0..nb {
@@ -74,21 +89,10 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
         for _ in 0..nb {
             self.fruits.push(Self::spawn_random(&self.carte));
         }
-        self.clean_malus();
-    }
-
-    /// Ensures that malus (negative score) fruits do not dominate.
-    fn clean_malus(&mut self) {
-        let total = self.fruits.len();
-        if self.fruits.iter().filter(|f| f.get_score() <= 0).count() <= 1 {
-            self.fruits.retain(|fruit| fruit.get_score() >= 0);
-        }
-        for _ in 0..total - self.fruits.len() {
-            self.fruits.push(Self::spawn_random(&self.carte));
-        }
     }
 
     /// Returns a list of fruits at the given position, copying them to avoid lock contention.
+    #[must_use]
     pub fn eat_some_fruits(&self, position: &Position) -> Option<Vec<Fruit<'a>>> {
         let eaten: Vec<Fruit<'a>> = self
             .fruits
@@ -133,5 +137,58 @@ impl<'a> Widget for FruitsManager<'a, 'a> {
 impl<'a> Widget for &FruitsManager<'a, 'a> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         self.render_ref(area, buf);
+    }
+}
+
+/// Test part:
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Arc;
+
+    // Mock definitions – Not really need there, but for example on how to share ressources for test
+    // Arc because tests are by default multi-htreaded (can be changed if need with : )
+    fn mock_map() -> Arc<Map<'static>> {
+        Arc::new(Map::new(2, Rect::new(0, 0, 160, 12)))
+    }
+
+    fn dummy_position() -> Position {
+        Position { x: 10, y: 10 }
+    }
+
+    #[test]
+    fn test_new_creates_correct_number_of_fruits() {
+        let map = mock_map();
+        let manager = FruitsManager::new(5, map);
+        assert_eq!(manager.fruits.len(), 5);
+    }
+
+    #[test]
+    fn test_replace_fruits_removes_and_adds_new() {
+        let map = mock_map();
+        let mut manager = FruitsManager::new(3, Arc::clone(&map));
+        let fruits_to_remove = vec![manager.fruits[0].clone()];
+        manager.replace_fruits(&fruits_to_remove);
+        assert_eq!(manager.fruits.len(), 3);
+        assert!(!manager.fruits.contains(&fruits_to_remove[0]));
+    }
+
+    #[test]
+    fn test_eat_some_fruits_returns_correct_fruit() {
+        let map = mock_map();
+        let mut manager = FruitsManager::new(3, Arc::clone(&map));
+        let fruit = Fruit::new(10, 1, dummy_position(), "🍎");
+        manager.fruits[0] = fruit.clone();
+        let result = manager.eat_some_fruits(&dummy_position());
+        assert!(result.is_some());
+        assert!(result.unwrap().contains(&fruit));
+    }
+
+    #[test]
+    fn test_eat_some_fruits_returns_none_if_no_fruit() {
+        let map = mock_map();
+        let manager = FruitsManager::new(3, Arc::clone(&map));
+        let result = manager.eat_some_fruits(&Position { x: 999, y: 999 });
+        assert!(result.is_none());
     }
 }

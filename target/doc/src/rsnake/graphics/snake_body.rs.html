@@ -212,7 +212,29 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::controls::direction::Direction;
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::controls::direction::Direction;
 <span class="kw">use </span><span class="kw">crate</span>::graphics::graphic_block::{GraphicBlock, Position};
 <span class="kw">use </span><span class="kw">crate</span>::graphics::map::Map;
 <span class="kw">use </span>ratatui::buffer::Buffer;
@@ -251,6 +273,7 @@
     ///
     /// # Returns
     /// A new `SnakeBody` instance with the specified parameters.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(
         body_image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
         head_image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
@@ -315,7 +338,7 @@
     <span class="doccomment">/// Checks if the snake's head overlaps with any part of its body.
     ///
     /// # Returns
-    /// - `Ok(&amp;Position)` if the head doesn't overlap with the body.
+    /// - `Ok(&amp;Position)` if the head does not overlap with the body.
     /// - `Err(())` if the head overlaps with any part of the body.
     </span><span class="kw">pub fn </span>head_position_and_overlap(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Position, ()&gt; {
         <span class="kw">let </span>head = <span class="self">self</span>.body[<span class="number">0</span>].get_position();
@@ -365,6 +388,7 @@
     /// # Returns
     /// - `Ok(&amp;Position)` if the snake's head does not overlap with its body and is within the map.
     /// - `Err(())` if the snake's head overlaps with its body.
+    </span><span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
     </span><span class="kw">pub fn </span>ramp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: <span class="kw-2">&amp;</span>Direction, carte: <span class="kw-2">&amp;</span>Map) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Position, ()&gt; {
         <span class="kw">match </span>direction {
             Direction::Up =&gt; <span class="self">self</span>.up(),
@@ -390,15 +414,22 @@
     ///
     /// # Parameters
     /// - `nb`:The number of segments to add or to remove to the snake's body.
+    /// # Panics
+    /// If no element in Snake, as we keep a minimum size (size_ini when resizing dow, should not happen
     </span><span class="kw">pub fn </span>relative_size_change(<span class="kw-2">&amp;mut </span><span class="self">self</span>, nb: i16) {
         <span class="kw">if </span>nb &gt; <span class="number">0 </span>{
             <span class="kw">for _ in </span><span class="number">0</span>..nb {
-                <span class="kw">let </span><span class="kw-2">mut </span>block_to_add = <span class="self">self</span>.body.last().unwrap().clone();
+                <span class="kw">let </span><span class="kw-2">mut </span>block_to_add = <span class="self">self
+                    </span>.body
+                    .last()
+                    .expect(<span class="string">"Snake body has no elements ! Something went wrong"</span>)
+                    .clone();
                 block_to_add.position.x += <span class="self">self</span>.case_size;
                 <span class="self">self</span>.body.push(block_to_add);
             }
         } <span class="kw">else </span>{
             <span class="comment">//We must remove some element, but keeping a minimum length for the snake
+            </span><span class="attr">#[allow(clippy::cast_sign_loss)]
             </span><span class="kw">let </span>sub = <span class="self">self</span>.body.len().saturating_sub((-nb) <span class="kw">as </span>usize);
             <span class="kw">let </span>to_keep = <span class="kw">if </span>sub &lt; <span class="self">self</span>.size_ini <span class="kw">as </span>usize {
                 <span class="self">self</span>.size_ini <span class="kw">as </span>usize
@@ -416,8 +447,21 @@
         <span class="self">self</span>.render_ref(area, buf);
     }
 }
-<span class="comment">//In general where you expect a widget to immutably work on its data, we recommended to implement Widget for a reference to the widget (impl Widget for &amp;MyWidget). If you need to store state between draw calls, implement StatefulWidget if you want the Widget to be immutable, or implement Widget for a mutable reference to the widget (impl Widget for &amp;mut MyWidget) if you want the widget to be mutable. The mutable widget pattern is used infrequently in apps, but can be quite useful.
-// A blanket implementation of Widget for &amp;W where W implements WidgetRef is provided. Widget is also implemented for &amp;str and String types.
+<span class="kw">impl </span>Widget <span class="kw">for </span><span class="kw-2">&amp;</span>SnakeBody&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        <span class="self">self</span>.render_ref(area, buf);
+    }
+}
+<span class="comment">//In general, where you expect a widget to immutably work on its data,we recommended implementing
+// Widget for a reference to the widget (impl Widget for &amp;MyWidget).
+// If you need to store state between draw calls, implement StatefulWidget if you want the Widget
+// to be immutable,
+// or implement Widget for a mutable reference to the widget (impl Widget for &amp;mut MyWidget).
+// If you want the widget to be mutable.
+// The mutable widget pattern is used infrequently in apps
+// but can be quite useful.
+// A blanket implementation of Widget for &amp;W where W implements WidgetRef is provided.
+// The Widget trait is also implemented for &amp;str and String types.
 
 </span><span class="kw">impl </span>WidgetRef <span class="kw">for </span>SnakeBody&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {

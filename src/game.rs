@@ -1,7 +1,7 @@
-use crate::controls::direction::Direction;
-use crate::controls::fruits_manager::FruitsManager;
-use crate::controls::game_state::{GameState, GameStatus};
-use crate::controls::speed::Speed;
+pub use crate::controls::direction::Direction;
+pub use crate::controls::fruits_manager::FruitsManager;
+pub use crate::controls::game_state::{GameState, GameStatus};
+pub use crate::controls::speed::Speed;
 use crate::graphics::map::Map;
 use crate::graphics::snake_body::SnakeBody;
 use crate::graphics::utils;
@@ -33,6 +33,7 @@ pub struct Game<'a, 'b, 'c> {
 }
 
 impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
+    #[must_use]
     pub fn new(
         speed: Speed,
         serpent: SnakeBody<'a>,
@@ -73,13 +74,15 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 .draw(|frame| {
                     //maps
                     frame.render_widget(self.carte.get_widget(), *self.carte.area());
-                    //FPS
+                    //FPS & snake speed
                     frame.render_widget(
                         Paragraph::new(format!(
-                            " Mean FPS: {} ",
+                            "Speed: {} {} Mean FPS: {} ",
+                            self.speed.get_name(),
+                            self.speed.get_symbol(),
                             (frame_count / start_time.elapsed().as_secs_f64()).floor()
                         )),
-                        Rect::new(120, 0, 25, 1),
+                        Rect::new(120, 0, 55, 1),
                     );
                     //sub scope to release the lock faster
                     {
@@ -134,7 +137,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 break 'render_loop;
             }
             //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            //thread::sleep(Duration::from_millis(12));
+            thread::sleep(Duration::from_millis(12));
         }
     }
     pub fn greeting(&mut self) -> bool {
@@ -175,9 +178,10 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         let input_gs = Arc::clone(&self.state);
         let input_dir = Arc::clone(&self.direction);
 
-        //if we want to have a variable speed put it under an Arc<Rw>
+        //if we want to have a variable speed put it under an Arc<Rw>, constant can directly be put under an Arc
+        // or share as normal variable by copy
         let game_speed = self.speed.get_speed();
-
+        let speed_score_modifier = self.speed.get_score_modifier();
         //In a scope to have auto cleaning by auto join at end of main thread
         thread::scope(|s| {
             // Game logic thread
@@ -188,7 +192,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                     &logic_gs,
                     &carte,
                     &fruits_manager,
-                    game_speed,
+                    (game_speed, speed_score_modifier),
                 );
             });
             // input logic thread
@@ -243,7 +247,7 @@ pub fn logic_loop(
     gs: &Arc<RwLock<GameState>>,
     carte: &Arc<Map>,
     fruits_manager: &Arc<RwLock<FruitsManager>>,
-    game_speed: u64,
+    (game_speed, speed_score_modifier): (u64, u16),
 ) {
     let mut gsc;
     loop {
@@ -258,6 +262,8 @@ pub fn logic_loop(
                 let movement = write_guard.ramp(&direction.read().unwrap(), carte);
                 if let Ok(position) = movement {
                     //In two steps to leverage the power of multiple read in // whereas we have only one write
+                    //did you find out a fruit ?
+                    // FruitManager:Inspired by BodySnake, for managing fruits
                     let fruits = fruits_manager.read().unwrap().eat_some_fruits(position);
                     if let Some(fruits) = fruits {
                         let score_fruits = fruits
@@ -266,16 +272,17 @@ pub fn logic_loop(
                             .sum::<i32>();
                         let size_effect = fruits
                             .iter()
-                            .map(super::graphics::fruit::Fruit::get_size_effect)
+                            .map(super::graphics::fruit::Fruit::get_grow_snake)
                             .sum::<i16>();
                         if score_fruits >= 0 {
                             write_guard.relative_size_change(size_effect);
                         }
-                        gs.write().unwrap().score += score_fruits;
+                        //NB:qConverting a u16 to an i32 is always safe in Rust because the range of u16 (0 to 65,535)
+                        // fits entirely within the range of i32 (−2,147,483,648 to 2,147,483,647).
+                        //So no need to do: speed_score_modifier.try_into().expect("too much")/match for conversion
+                        gs.write().unwrap().score += score_fruits * i32::from(speed_score_modifier);
                         fruits_manager.write().unwrap().replace_fruits(&fruits);
                     }
-                    //did you find out a fruit ?
-                    // FruitManager:Inspired by BodySnake, for managing fruits
                 } else {
                     //Ouch. You bite yourself
                     let mut state_guard = gs.write().unwrap();

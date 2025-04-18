@@ -300,10 +300,17 @@
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::controls::direction::Direction;
-<span class="kw">use </span><span class="kw">crate</span>::controls::fruits_manager::FruitsManager;
-<span class="kw">use </span><span class="kw">crate</span>::controls::game_state::{GameState, GameStatus};
-<span class="kw">use </span><span class="kw">crate</span>::controls::speed::Speed;
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a></pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::controls::direction::Direction;
+<span class="kw">pub use </span><span class="kw">crate</span>::controls::fruits_manager::FruitsManager;
+<span class="kw">pub use </span><span class="kw">crate</span>::controls::game_state::{GameState, GameStatus};
+<span class="kw">pub use </span><span class="kw">crate</span>::controls::speed::Speed;
 <span class="kw">use </span><span class="kw">crate</span>::graphics::map::Map;
 <span class="kw">use </span><span class="kw">crate</span>::graphics::snake_body::SnakeBody;
 <span class="kw">use </span><span class="kw">crate</span>::graphics::utils;
@@ -335,7 +342,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; {
-    <span class="kw">pub fn </span>new(
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>new(
         speed: Speed,
         serpent: SnakeBody&lt;<span class="lifetime">'a</span>&gt;,
         carte: Map&lt;<span class="lifetime">'b</span>&gt;,
@@ -375,13 +383,15 @@
                 .draw(|frame| {
                     <span class="comment">//maps
                     </span>frame.render_widget(<span class="self">self</span>.carte.get_widget(), <span class="kw-2">*</span><span class="self">self</span>.carte.area());
-                    <span class="comment">//FPS
+                    <span class="comment">//FPS &amp; snake speed
                     </span>frame.render_widget(
                         Paragraph::new(<span class="macro">format!</span>(
-                            <span class="string">" Mean FPS: {} "</span>,
+                            <span class="string">"Speed: {} {} Mean FPS: {} "</span>,
+                            <span class="self">self</span>.speed.get_name(),
+                            <span class="self">self</span>.speed.get_symbol(),
                             (frame_count / start_time.elapsed().as_secs_f64()).floor()
                         )),
-                        Rect::new(<span class="number">120</span>, <span class="number">0</span>, <span class="number">25</span>, <span class="number">1</span>),
+                        Rect::new(<span class="number">120</span>, <span class="number">0</span>, <span class="number">55</span>, <span class="number">1</span>),
                     );
                     <span class="comment">//sub scope to release the lock faster
                     </span>{
@@ -436,8 +446,8 @@
                 </span><span class="kw">break </span><span class="lifetime">'render_loop</span>;
             }
             <span class="comment">//If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            //thread::sleep(Duration::from_millis(12));
-        </span>}
+            </span>thread::sleep(Duration::from_millis(<span class="number">12</span>));
+        }
     }
     <span class="kw">pub fn </span>greeting(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
         greeting(<span class="kw-2">&amp;mut </span><span class="self">self</span>.terminal);
@@ -477,9 +487,10 @@
         </span><span class="kw">let </span>input_gs = Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.state);
         <span class="kw">let </span>input_dir = Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.direction);
 
-        <span class="comment">//if we want to have a variable speed put it under an Arc&lt;Rw&gt;
+        <span class="comment">//if we want to have a variable speed put it under an Arc&lt;Rw&gt;, constant can directly be put under an Arc
+        // or share as normal variable by copy
         </span><span class="kw">let </span>game_speed = <span class="self">self</span>.speed.get_speed();
-
+        <span class="kw">let </span>speed_score_modifier = <span class="self">self</span>.speed.get_score_modifier();
         <span class="comment">//In a scope to have auto cleaning by auto join at end of main thread
         </span>thread::scope(|s| {
             <span class="comment">// Game logic thread
@@ -490,7 +501,7 @@
                     <span class="kw-2">&amp;</span>logic_gs,
                     <span class="kw-2">&amp;</span>carte,
                     <span class="kw-2">&amp;</span>fruits_manager,
-                    game_speed,
+                    (game_speed, speed_score_modifier),
                 );
             });
             <span class="comment">// input logic thread
@@ -545,7 +556,7 @@
     gs: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;GameState&gt;&gt;,
     carte: <span class="kw-2">&amp;</span>Arc&lt;Map&gt;,
     fruits_manager: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;FruitsManager&gt;&gt;,
-    game_speed: u64,
+    (game_speed, speed_score_modifier): (u64, u16),
 ) {
     <span class="kw">let </span><span class="kw-2">mut </span>gsc;
     <span class="kw">loop </span>{
@@ -560,6 +571,8 @@
                 <span class="kw">let </span>movement = write_guard.ramp(<span class="kw-2">&amp;</span>direction.read().unwrap(), carte);
                 <span class="kw">if let </span><span class="prelude-val">Ok</span>(position) = movement {
                     <span class="comment">//In two steps to leverage the power of multiple read in // whereas we have only one write
+                    //did you find out a fruit ?
+                    // FruitManager:Inspired by BodySnake, for managing fruits
                     </span><span class="kw">let </span>fruits = fruits_manager.read().unwrap().eat_some_fruits(position);
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(fruits) = fruits {
                         <span class="kw">let </span>score_fruits = fruits
@@ -568,17 +581,18 @@
                             .sum::&lt;i32&gt;();
                         <span class="kw">let </span>size_effect = fruits
                             .iter()
-                            .map(<span class="kw">super</span>::graphics::fruit::Fruit::get_size_effect)
+                            .map(<span class="kw">super</span>::graphics::fruit::Fruit::get_grow_snake)
                             .sum::&lt;i16&gt;();
                         <span class="kw">if </span>score_fruits &gt;= <span class="number">0 </span>{
                             write_guard.relative_size_change(size_effect);
                         }
-                        gs.write().unwrap().score += score_fruits;
+                        <span class="comment">//NB:qConverting a u16 to an i32 is always safe in Rust because the range of u16 (0 to 65,535)
+                        // fits entirely within the range of i32 (−2,147,483,648 to 2,147,483,647).
+                        //So no need to do: speed_score_modifier.try_into().expect("too much")/match for conversion
+                        </span>gs.write().unwrap().score += score_fruits * i32::from(speed_score_modifier);
                         fruits_manager.write().unwrap().replace_fruits(<span class="kw-2">&amp;</span>fruits);
                     }
-                    <span class="comment">//did you find out a fruit ?
-                    // FruitManager:Inspired by BodySnake, for managing fruits
-                </span>} <span class="kw">else </span>{
+                } <span class="kw">else </span>{
                     <span class="comment">//Ouch. You bite yourself
                     </span><span class="kw">let </span><span class="kw-2">mut </span>state_guard = gs.write().unwrap();
                     <span class="kw">if </span>(state_guard.life) &gt;= <span class="number">1 </span>{
