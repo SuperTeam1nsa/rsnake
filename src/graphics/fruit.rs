@@ -7,10 +7,11 @@
 //!
 //! # Example
 //! ```rust
-//! use game::graphics::fruit::{Fruit, Position};
+//! use rsnake::graphics::fruit::Fruit;
+//! use rsnake::graphics::graphic_block::Position;
 //!
 //! let position = Position { x: 5, y: 10 };
-//! let apple = Fruit::new(40, position, "🍎");
+//! let apple = Fruit::new(40, 2,position, "🍎");
 //! assert_eq!(apple.get_score(), 40);
 //! ```
 //!
@@ -44,31 +45,40 @@ pub const FRUITS_SCORES_PROBABILITIES: &[(&str, i32, u16, i16)] = &[
 #[derive(PartialEq, Debug, Clone)]
 pub struct Fruit<'a> {
     score: i32,
-    size_effect: i16,
+    grow_snake: i16,
     graphic_block: GraphicBlock<'a>,
 }
 
 impl<'a> Fruit<'a> {
     /// Creates a new `Fruit` at a given position with an associated score and image.
-    pub fn new(score: i32, size_effect: i16, position: Position, image: &'a str) -> Fruit<'a> {
+    #[must_use]
+    pub fn new(
+        score: i32,
+        grow_snake_by_relative_nb: i16,
+        position: Position,
+        image: &'a str,
+    ) -> Fruit<'a> {
         Self {
             score,
-            size_effect,
+            grow_snake: grow_snake_by_relative_nb,
             graphic_block: GraphicBlock::new(position, image, Style::default()),
         }
     }
 
     /// Checks if the fruit is at a specific position.
+    #[must_use]
     pub fn is_at_position(&self, position: &Position) -> bool {
         self.graphic_block.get_position() == position
     }
 
     /// Returns the score of the fruit.
+    #[must_use]
     pub fn get_score(&self) -> i32 {
         self.score
     }
-    pub fn get_size_effect(&self) -> i16 {
-        self.size_effect
+    #[must_use]
+    pub fn get_grow_snake(&self) -> i16 {
+        self.grow_snake
     }
 }
 

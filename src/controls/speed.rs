@@ -4,21 +4,24 @@
 //!
 //! # Example
 //! ```rust
-//! use game::{Speed, Velocity};
+//! use rsnake::controls::speed::Velocity;
+//! use rsnake::controls::speed::Speed;
 //!
 //! let fast_speed = Speed::new(&Velocity::Fast);
 //! println!("Speed: {}", fast_speed.get_speed());
+//! assert_eq!("Fast", fast_speed.get_name());
 //! ```
 //!
 
 use clap::ValueEnum;
-use std::str::FromStr;
 
 /// Represents a speed entry with a name and a value.
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct Speed {
-    speed_name: &'static str,
+pub struct Speed {
+    name: &'static str,
     value: u64,
+    score_modifier: u16,
+    symbol: &'static str,
 }
 
 impl Speed {
@@ -26,20 +29,28 @@ impl Speed {
     pub fn new(level: &Velocity) -> Self {
         match level {
             Velocity::Slow => Speed {
-                speed_name: "Slow",
+                name: "Slow",
                 value: 150,
+                score_modifier: 1,
+                symbol: "🐢",
             },
             Velocity::Normal => Speed {
-                speed_name: "Normal",
+                name: "Normal",
                 value: 125,
+                score_modifier: 2,
+                symbol: "🐍",
             },
             Velocity::Fast => Speed {
-                speed_name: "Fast",
+                name: "Fast",
                 value: 100,
+                score_modifier: 3,
+                symbol: "🐉",
             },
             Velocity::Tremendous => Speed {
-                speed_name: "Tremendous",
+                name: "Tremendous",
                 value: 80,
+                score_modifier: 4,
+                symbol: "🦖", //🪽
             },
         }
     }
@@ -47,6 +58,16 @@ impl Speed {
     /// Returns the speed value.
     pub fn get_speed(&self) -> u64 {
         self.value
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name
+    }
+    pub fn get_symbol(&self) -> &str {
+        self.symbol
+    }
+    pub fn get_score_modifier(&self) -> u16 {
+        self.score_modifier
     }
 }
 

@@ -129,18 +129,84 @@
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruits Manager
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruits Manager
 //!
 //! This module defines the `FruitsManager` struct, which is responsible for handling fruit objects within a game.
 //! It includes methods for spawning, replacing, and interacting with fruits.
 //!
 //! # Example
 //! ```rust
-//! use game::FruitsManager;
+//! use rsnake::game::FruitsManager;
+//! use rsnake::graphics::map::Map;
 //! use std::sync::Arc;
+//! use ratatui::layout::Rect;
+//! use rsnake::graphics::graphic_block::Position;
 //!
 //! let case_size = 2;
-//! let map_size = Rect::new(0, 0, 200, 10)
+//! let map_size = Rect::new(0, 0, 200, 10);
 //! let map = Arc::new(Map::new(case_size, map_size));
 //! let number_of_fruits_to_manage = 10;
 //! let mut manager = FruitsManager::new(number_of_fruits_to_manage, map.clone());
@@ -172,6 +238,18 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; FruitsManager&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
     <span class="doccomment">/// Creates a new `FruitsManager` with a given number of fruits.
+    ///
+    /// # Example
+    /// ```
+    /// use std::sync::Arc;
+    /// use ratatui::layout::Rect;
+    /// use rsnake::game::FruitsManager;
+    /// use rsnake::graphics::map::Map;
+    /// let x =42;
+    /// let map = Arc::new(Map::new(2, Rect::new(0,0, 160,10)));
+    /// let manager = FruitsManager::new(3, map);
+    /// ```
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(nb: u16, carte: Arc&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>fruits: Vec&lt;Fruit&gt; = Vec::with_capacity(nb <span class="kw">as </span>usize);
         <span class="kw">for _ in </span><span class="number">0</span>..nb {
@@ -205,21 +283,10 @@
         <span class="kw">for _ in </span><span class="number">0</span>..nb {
             <span class="self">self</span>.fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span><span class="self">self</span>.carte));
         }
-        <span class="self">self</span>.clean_malus();
-    }
-
-    <span class="doccomment">/// Ensures that malus (negative score) fruits do not dominate.
-    </span><span class="kw">fn </span>clean_malus(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">let </span>total = <span class="self">self</span>.fruits.len();
-        <span class="kw">if </span><span class="self">self</span>.fruits.iter().filter(|f| f.get_score() &lt;= <span class="number">0</span>).count() &lt;= <span class="number">1 </span>{
-            <span class="self">self</span>.fruits.retain(|fruit| fruit.get_score() &gt;= <span class="number">0</span>);
-        }
-        <span class="kw">for _ in </span><span class="number">0</span>..total - <span class="self">self</span>.fruits.len() {
-            <span class="self">self</span>.fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span><span class="self">self</span>.carte));
-        }
     }
 
     <span class="doccomment">/// Returns a list of fruits at the given position, copying them to avoid lock contention.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>eat_some_fruits(<span class="kw-2">&amp;</span><span class="self">self</span>, position: <span class="kw-2">&amp;</span>Position) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Fruit&lt;<span class="lifetime">'a</span>&gt;&gt;&gt; {
         <span class="kw">let </span>eaten: Vec&lt;Fruit&lt;<span class="lifetime">'a</span>&gt;&gt; = <span class="self">self
             </span>.fruits
@@ -258,6 +325,65 @@
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>FruitsManager&lt;<span class="lifetime">'a</span>, <span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="self">self</span>.render_ref(area, buf);
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span><span class="kw-2">&amp;</span>FruitsManager&lt;<span class="lifetime">'a</span>, <span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        <span class="self">self</span>.render_ref(area, buf);
+    }
+}
+
+<span class="doccomment">/// Test part:
+</span><span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::sync::Arc;
+
+    <span class="comment">// Mock definitions – Not really need there, but for example on how to share ressources for test
+    // Arc because tests are by default multi-htreaded (can be changed if need with : )
+    </span><span class="kw">fn </span>mock_map() -&gt; Arc&lt;Map&lt;<span class="lifetime">'static</span>&gt;&gt; {
+        Arc::new(Map::new(<span class="number">2</span>, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">160</span>, <span class="number">12</span>)))
+    }
+
+    <span class="kw">fn </span>dummy_position() -&gt; Position {
+        Position { x: <span class="number">10</span>, y: <span class="number">10 </span>}
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_new_creates_correct_number_of_fruits() {
+        <span class="kw">let </span>map = mock_map();
+        <span class="kw">let </span>manager = FruitsManager::new(<span class="number">5</span>, map);
+        <span class="macro">assert_eq!</span>(manager.fruits.len(), <span class="number">5</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_replace_fruits_removes_and_adds_new() {
+        <span class="kw">let </span>map = mock_map();
+        <span class="kw">let </span><span class="kw-2">mut </span>manager = FruitsManager::new(<span class="number">3</span>, Arc::clone(<span class="kw-2">&amp;</span>map));
+        <span class="kw">let </span>fruits_to_remove = <span class="macro">vec!</span>[manager.fruits[<span class="number">0</span>].clone()];
+        manager.replace_fruits(<span class="kw-2">&amp;</span>fruits_to_remove);
+        <span class="macro">assert_eq!</span>(manager.fruits.len(), <span class="number">3</span>);
+        <span class="macro">assert!</span>(!manager.fruits.contains(<span class="kw-2">&amp;</span>fruits_to_remove[<span class="number">0</span>]));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_eat_some_fruits_returns_correct_fruit() {
+        <span class="kw">let </span>map = mock_map();
+        <span class="kw">let </span><span class="kw-2">mut </span>manager = FruitsManager::new(<span class="number">3</span>, Arc::clone(<span class="kw-2">&amp;</span>map));
+        <span class="kw">let </span>fruit = Fruit::new(<span class="number">10</span>, <span class="number">1</span>, dummy_position(), <span class="string">"🍎"</span>);
+        manager.fruits[<span class="number">0</span>] = fruit.clone();
+        <span class="kw">let </span>result = manager.eat_some_fruits(<span class="kw-2">&amp;</span>dummy_position());
+        <span class="macro">assert!</span>(result.is_some());
+        <span class="macro">assert!</span>(result.unwrap().contains(<span class="kw-2">&amp;</span>fruit));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_eat_some_fruits_returns_none_if_no_fruit() {
+        <span class="kw">let </span>map = mock_map();
+        <span class="kw">let </span>manager = FruitsManager::new(<span class="number">3</span>, Arc::clone(<span class="kw-2">&amp;</span>map));
+        <span class="kw">let </span>result = manager.eat_some_fruits(<span class="kw-2">&amp;</span>Position { x: <span class="number">999</span>, y: <span class="number">999 </span>});
+        <span class="macro">assert!</span>(result.is_none());
     }
 }
 </code></pre></div></section></main></body></html>

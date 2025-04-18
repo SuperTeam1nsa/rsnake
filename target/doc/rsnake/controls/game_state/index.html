@@ -2,7 +2,7 @@
 <p>This module defines a <code>GameState</code> struct that manages game-related flags such as life, score, and game status.
 It provides methods for initializing and resetting the game state.</p>
 <h2 id="example"><a class="doc-anchor" href="#example">§</a>Example</h2>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>game::GameState;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rsnake::game::{GameState, GameStatus};
 
 <span class="kw">let </span><span class="kw-2">mut </span>state = GameState::new(<span class="number">3</span>); <span class="comment">// Initialize game with 3 lives
 </span><span class="macro">assert_eq!</span>(state.life, <span class="number">3</span>);

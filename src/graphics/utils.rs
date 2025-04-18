@@ -48,7 +48,9 @@ pub fn top_margin(area: Rect, marge: u16) -> Rect {
         .areas(area);
     area
 }*/
-
+/// Print the welcome screen, reminding controls
+/// # Panics
+/// Will panic if no suitable terminal for displaying ios provided
 pub fn greeting(terminal: &mut DefaultTerminal) {
     //terminal.clear().expect("Unusable terminal clear");
     terminal
@@ -82,15 +84,19 @@ fn retro_paragraph(text: &'static str, color: Color) -> Paragraph<'static> {
         .style(Style::default().fg(color))
         .alignment(ratatui::layout::Alignment::Center)
 }
+#[must_use]
 pub fn game_over_paragraph() -> Paragraph<'static> {
     retro_paragraph(GAME_OVER_TEXT, Color::Red)
 }
+#[must_use]
 pub fn pause_paragraph() -> Paragraph<'static> {
     retro_paragraph(PAUSE_TEXT, Color::Green)
 }
+#[must_use]
 pub fn byebye_paragraph() -> Paragraph<'static> {
     retro_paragraph(FAREWELL_TEXT, Color::DarkGray)
 }
+#[must_use]
 pub fn restart_paragraph() -> Paragraph<'static> {
     retro_paragraph(RESTART_TEXT, Color::LightYellow)
 }

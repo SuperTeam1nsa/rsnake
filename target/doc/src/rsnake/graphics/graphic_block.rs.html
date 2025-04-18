@@ -106,7 +106,11 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a></pre></div><pre class="rust"><code><span class="doccomment">/// This module contains definitions and implementations for graphical blocks used in the game.
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a></pre></div><pre class="rust"><code><span class="doccomment">/// This module contains definitions and implementations for graphical blocks used in the game.
 ///
 /// It includes the following components:
 ///
@@ -116,6 +120,7 @@
 <span class="kw">use </span>ratatui::layout::Rect;
 <span class="kw">use </span>ratatui::prelude::{Span, Style};
 <span class="kw">use </span>ratatui::widgets::{Widget, WidgetRef};
+
 
 <span class="doccomment">/// A struct representing a graphical block that can be displayed in the game.
 /// It holds the position and visual representation (image) of the block.
@@ -137,8 +142,8 @@
 /// - `y`: The y-coordinate of the block's position.
 </span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Position {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) x: u16,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) y: u16,
+    <span class="kw">pub </span>x: u16,
+    <span class="kw">pub </span>y: u16,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; GraphicBlock&lt;<span class="lifetime">'a</span>&gt; {
@@ -157,6 +162,7 @@
     /// But for a more general use, the lifetime parameter is better, allowing dynamic text (e.g., changing each time)
     /// If you want no lifetime and dynamic text, add an own `String`, to `GraphicBlock` and generate for each rendering a new `Span`,
     /// but this might affect performance.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(position: Position, image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, style: Style) -&gt; GraphicBlock&lt;<span class="lifetime">'a</span>&gt; {
         GraphicBlock {
             position,
@@ -176,12 +182,14 @@
     ///
     /// # Returns
     /// A reference to the current position of the graphic block.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>get_position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Position {
         <span class="kw-2">&amp;</span><span class="self">self</span>.position
     }
 }
-
-<span class="kw">impl </span>WidgetRef <span class="kw">for </span>GraphicBlock&lt;<span class="lifetime">'_</span>&gt; {
+<span class="doccomment">///NB: Could also have used impl Widget for &amp;T even if more limited
+/// see: &lt;https://github.com/ratatui/ratatui/discussions/1274&gt;
+</span><span class="kw">impl </span>WidgetRef <span class="kw">for </span>GraphicBlock&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Renders the graphic block into the given buffer.
     ///
     /// # Parameters

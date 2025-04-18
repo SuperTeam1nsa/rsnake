@@ -4,7 +4,7 @@
 //!
 //! # Example
 //! ```rust
-//! use game::Direction;
+//! use rsnake::game::Direction;
 //!
 //! let dir = Direction::Up;
 //! match dir {

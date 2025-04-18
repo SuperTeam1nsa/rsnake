@@ -30,8 +30,8 @@ pub struct GraphicBlock<'a> {
 /// - `y`: The y-coordinate of the block's position.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Position {
-    pub(crate) x: u16,
-    pub(crate) y: u16,
+    pub x: u16,
+    pub y: u16,
 }
 
 impl<'a> GraphicBlock<'a> {
@@ -50,6 +50,7 @@ impl<'a> GraphicBlock<'a> {
     /// But for a more general use, the lifetime parameter is better, allowing dynamic text (e.g., changing each time)
     /// If you want no lifetime and dynamic text, add an own `String`, to `GraphicBlock` and generate for each rendering a new `Span`,
     /// but this might affect performance.
+    #[must_use]
     pub fn new(position: Position, image: &'a str, style: Style) -> GraphicBlock<'a> {
         GraphicBlock {
             position,
@@ -69,12 +70,13 @@ impl<'a> GraphicBlock<'a> {
     ///
     /// # Returns
     /// A reference to the current position of the graphic block.
+    #[must_use]
     pub fn get_position(&self) -> &Position {
         &self.position
     }
 }
 ///NB: Could also have used impl Widget for &T even if more limited
-/// see:https://github.com/ratatui/ratatui/discussions/1274
+/// see: <https://github.com/ratatui/ratatui/discussions/1274>
 impl WidgetRef for GraphicBlock<'_> {
     /// Renders the graphic block into the given buffer.
     ///

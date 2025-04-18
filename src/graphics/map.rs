@@ -29,6 +29,7 @@ impl Map<'_> {
     ///
     /// # Note
     /// The map will have a double border and the title "Snake !".
+    #[must_use]
     pub fn new<'a>(case_size_in_px: u16, viewport: Rect) -> Map<'a> {
         Map {
             block: Block::bordered()
@@ -49,10 +50,14 @@ impl Map<'_> {
     ///
     /// # Example
     /// ```rust
+    /// use ratatui::layout::Rect;
+    /// use rsnake::graphics::graphic_block::Position;
+    /// use rsnake::graphics::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// assert!(map.out_of_map(&position));
     /// ```
+    #[must_use]
     pub fn out_of_map(&self, Position { x, y }: &Position) -> bool {
         let x_max = self.viewport.width - self.case_size;
         let y_max = self.viewport.height - (self.case_size / 2);
@@ -72,11 +77,15 @@ impl Map<'_> {
     ///
     /// # Example
     /// ```rust
+    /// use ratatui::layout::Rect;
+    /// use rsnake::graphics::graphic_block::Position;
+    /// use rsnake::graphics::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// let new_position = map.out_of_map_reverse_position(&position);
     /// assert_eq!(new_position.x, 10);  // Wrapped to the opposite side
     /// ```
+    #[must_use]
     pub fn out_of_map_reverse_position(&self, Position { x, y }: &Position) -> Position {
         let x_max = self.viewport.width - self.case_size;
         let y_max = self.viewport.height - (self.case_size / 2);
@@ -99,6 +108,7 @@ impl Map<'_> {
     ///
     /// # Returns
     /// A reference to the `Rect` representing the map's viewport.
+    #[must_use]
     pub fn area(&self) -> &Rect {
         &self.viewport
     }
@@ -107,6 +117,7 @@ impl Map<'_> {
     ///
     /// # Returns
     /// A reference to the `Block` widget.
+    #[must_use]
     pub fn get_widget(&self) -> &Block {
         &self.block
     }
@@ -115,6 +126,7 @@ impl Map<'_> {
     ///
     /// # Returns
     /// The size of each case in pixels.
+    #[must_use]
     pub fn get_case_size(&self) -> u16 {
         self.case_size
     }

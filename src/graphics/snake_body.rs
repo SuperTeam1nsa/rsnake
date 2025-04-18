@@ -37,6 +37,7 @@ impl<'a> SnakeBody<'a> {
     ///
     /// # Returns
     /// A new `SnakeBody` instance with the specified parameters.
+    #[must_use]
     pub fn new(
         body_image: &'a str,
         head_image: &'a str,
@@ -177,10 +178,16 @@ impl<'a> SnakeBody<'a> {
     ///
     /// # Parameters
     /// - `nb`:The number of segments to add or to remove to the snake's body.
+    /// # Panics
+    /// If no element in Snake, as we keep a minimum size (size_ini when resizing dow, should not happen
     pub fn relative_size_change(&mut self, nb: i16) {
         if nb > 0 {
             for _ in 0..nb {
-                let mut block_to_add = self.body.last().unwrap().clone();
+                let mut block_to_add = self
+                    .body
+                    .last()
+                    .expect("Snake body has no elements ! Something went wrong")
+                    .clone();
                 block_to_add.position.x += self.case_size;
                 self.body.push(block_to_add);
             }

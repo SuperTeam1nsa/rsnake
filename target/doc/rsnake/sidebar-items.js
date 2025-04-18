@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["controls","game","graphics"]};
+window.SIDEBAR_ITEMS = {"fn":["start_snake"],"mod":["cli","controls","game","graphics"]};

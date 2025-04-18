@@ -94,7 +94,13 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a></pre></div><pre class="rust"><code><span class="kw">use </span>ratatui::style::{Color, Style, Stylize};
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a></pre></div><pre class="rust"><code><span class="kw">use </span>ratatui::style::{Color, Style, Stylize};
 <span class="kw">use </span>ratatui::text::{Line, Text};
 <span class="kw">use </span>ratatui::widgets::{Block, BorderType, Paragraph};
 <span class="kw">use </span>ratatui::DefaultTerminal;
@@ -144,7 +150,9 @@ pub fn top_margin(area: Rect, marge: u16) -&gt; Rect {
         .areas(area);
     area
 }*/
-
+</span><span class="doccomment">/// Print the welcome screen, reminding controls
+/// # Panics
+/// Will panic if no suitable terminal for displaying ios provided
 </span><span class="kw">pub fn </span>greeting(terminal: <span class="kw-2">&amp;mut </span>DefaultTerminal) {
     <span class="comment">//terminal.clear().expect("Unusable terminal clear");
     </span>terminal
@@ -178,16 +186,20 @@ pub fn top_margin(area: Rect, marge: u16) -&gt; Rect {
         .style(Style::default().fg(color))
         .alignment(ratatui::layout::Alignment::Center)
 }
-<span class="kw">pub fn </span>game_over_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
+<span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>game_over_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
     retro_paragraph(GAME_OVER_TEXT, Color::Red)
 }
-<span class="kw">pub fn </span>pause_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
+<span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>pause_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
     retro_paragraph(PAUSE_TEXT, Color::Green)
 }
-<span class="kw">pub fn </span>byebye_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
+<span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>byebye_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
     retro_paragraph(FAREWELL_TEXT, Color::DarkGray)
 }
-<span class="kw">pub fn </span>restart_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
+<span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>restart_paragraph() -&gt; Paragraph&lt;<span class="lifetime">'static</span>&gt; {
     retro_paragraph(RESTART_TEXT, Color::LightYellow)
 }
 </code></pre></div></section></main></body></html>
