@@ -192,7 +192,16 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruits Manager
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Fruits Manager
 //!
 //! This module defines the `FruitsManager` struct, which is responsible for handling fruit objects within a game.
 //! It includes methods for spawning, replacing, and interacting with fruits.
@@ -201,13 +210,13 @@
 //! ```rust
 //! use rsnake::game::FruitsManager;
 //! use rsnake::graphics::map::Map;
-//! use std::sync::Arc;
+//! use std::sync::{Arc, RwLock};
 //! use ratatui::layout::Rect;
 //! use rsnake::graphics::graphic_block::Position;
 //!
 //! let case_size = 2;
 //! let map_size = Rect::new(0, 0, 200, 10);
-//! let map = Arc::new(Map::new(case_size, map_size));
+//! let map = Arc::new(RwLock::new(Map::new(case_size, map_size)));
 //! let number_of_fruits_to_manage = 10;
 //! let mut manager = FruitsManager::new(number_of_fruits_to_manage, map.clone());
 //!
@@ -228,32 +237,36 @@
 <span class="kw">use </span>ratatui::layout::Rect;
 <span class="kw">use </span>ratatui::prelude::Widget;
 <span class="kw">use </span>ratatui::widgets::WidgetRef;
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::sync::{Arc, RwLock};
 
 <span class="doccomment">/// Manages fruit objects within the game.
 </span><span class="kw">pub struct </span>FruitsManager&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>: <span class="lifetime">'a</span>&gt; {
-    fruits: Vec&lt;Fruit&lt;<span class="lifetime">'a</span>&gt;&gt;, <span class="comment">// List of fruits currently in the game
-    </span>carte: Arc&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;,    <span class="comment">// Reference to the game map
+    fruits: Vec&lt;Fruit&lt;<span class="lifetime">'a</span>&gt;&gt;,      <span class="comment">// List of fruits currently in the game
+    </span>carte: Arc&lt;RwLock&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;&gt;, <span class="comment">// Reference to the game map
 </span>}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; FruitsManager&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
     <span class="doccomment">/// Creates a new `FruitsManager` with a given number of fruits.
-    ///
+    /// # Panics
+    /// if guard cannot be got for Map (whenever a previous panic poisoned guard)
     /// # Example
     /// ```
-    /// use std::sync::Arc;
+    /// use std::sync::{Arc, RwLock};
     /// use ratatui::layout::Rect;
     /// use rsnake::game::FruitsManager;
     /// use rsnake::graphics::map::Map;
     /// let x =42;
-    /// let map = Arc::new(Map::new(2, Rect::new(0,0, 160,10)));
+    /// let map = Arc::new(RwLock::new(Map::new(2, Rect::new(0,0, 160,10))));
     /// let manager = FruitsManager::new(3, map);
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>new(nb: u16, carte: Arc&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(nb: u16, carte: Arc&lt;RwLock&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>fruits: Vec&lt;Fruit&gt; = Vec::with_capacity(nb <span class="kw">as </span>usize);
-        <span class="kw">for _ in </span><span class="number">0</span>..nb {
-            fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span>carte));
+        {
+            <span class="kw">let </span>c = carte.read().unwrap();
+            <span class="kw">for _ in </span><span class="number">0</span>..nb {
+                fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span>c));
+            }
         }
         <span class="self">Self </span>{ fruits, carte }
     }
@@ -276,12 +289,17 @@
     }
 
     <span class="doccomment">/// Replaces eaten fruits with new random ones and ensures balance.
+    /// # Panics
+    /// if guard cannot be got for Map (whenever a previous panic poisoned guard)
     </span><span class="kw">pub fn </span>replace_fruits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fruits_to_remove: <span class="kw-2">&amp;</span>[Fruit&lt;<span class="lifetime">'a</span>&gt;]) {
         <span class="kw">let </span>nb = fruits_to_remove.len();
         <span class="self">self</span>.fruits
             .retain(|fruit| !fruits_to_remove.contains(fruit));
-        <span class="kw">for _ in </span><span class="number">0</span>..nb {
-            <span class="self">self</span>.fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span><span class="self">self</span>.carte));
+        {
+            <span class="kw">let </span>carte_guard = <span class="self">self</span>.carte.read().unwrap();
+            <span class="kw">for _ in </span><span class="number">0</span>..nb {
+                <span class="self">self</span>.fruits.push(<span class="self">Self</span>::spawn_random(<span class="kw-2">&amp;</span>carte_guard));
+            }
         }
     }
 
@@ -340,10 +358,10 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>std::sync::Arc;
 
-    <span class="comment">// Mock definitions – Not really need there, but for example on how to share ressources for test
-    // Arc because tests are by default multi-htreaded (can be changed if need with : )
-    </span><span class="kw">fn </span>mock_map() -&gt; Arc&lt;Map&lt;<span class="lifetime">'static</span>&gt;&gt; {
-        Arc::new(Map::new(<span class="number">2</span>, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">160</span>, <span class="number">12</span>)))
+    <span class="doccomment">/// Mock definitions
+    /// Not really need it there,but for example, on how to share ressources for test
+    </span><span class="kw">fn </span>mock_map() -&gt; Arc&lt;RwLock&lt;Map&lt;<span class="lifetime">'static</span>&gt;&gt;&gt; {
+        Arc::new(RwLock::new(Map::new(<span class="number">2</span>, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">160</span>, <span class="number">12</span>))))
     }
 
     <span class="kw">fn </span>dummy_position() -&gt; Position {

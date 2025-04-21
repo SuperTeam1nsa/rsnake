@@ -61,7 +61,8 @@
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Game State Management
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Game State Management
 //!
 //! This module defines a `GameState` struct that manages game-related flags such as life, score, and game status.
 //! It provides methods for initializing and resetting the game state.
@@ -108,6 +109,7 @@
     ///
     /// # Returns
     /// A new instance of `GameState` with default values.
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(life: u16) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             life,

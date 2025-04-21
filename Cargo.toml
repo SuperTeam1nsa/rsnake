@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-crossterm = "0.29.0"
+crossterm = { version = "0.29.0", features = ["events"] }
 #see https://docs.rs/ratatui/latest/ratatui/widgets/trait.WidgetRef.html need to have better performance avoiding cloning widget each time
 #https://github.com/ratatui/ratatui/discussions/1274
 ratatui = { version = "0.30.0-alpha.2", features = ["unstable-widget-ref"] }
-rand = "0.9.0"
-clap = { version = "4.5.34", features = ["derive"] }
+rand = "0.9.1"
+clap = { version = "4.5.37", features = ["derive"] }
 
 #For testing cli easly
 [dev-dependencies]

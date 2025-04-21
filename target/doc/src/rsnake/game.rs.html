@@ -307,7 +307,39 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a></pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::controls::direction::Direction;
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a></pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::controls::direction::Direction;
 <span class="kw">pub use </span><span class="kw">crate</span>::controls::fruits_manager::FruitsManager;
 <span class="kw">pub use </span><span class="kw">crate</span>::controls::game_state::{GameState, GameStatus};
 <span class="kw">pub use </span><span class="kw">crate</span>::controls::speed::Speed;
@@ -328,20 +360,20 @@
 <span class="kw">const </span>QUIT_KEYS: [KeyCode; <span class="number">2</span>] = [KeyCode::Char(<span class="string">'q'</span>), KeyCode::Char(<span class="string">'Q'</span>)];
 <span class="kw">const </span>PAUSE_KEYS: [KeyCode; <span class="number">3</span>] = [KeyCode::Char(<span class="string">'p'</span>), KeyCode::Char(<span class="string">'P'</span>), KeyCode::Char(<span class="string">' '</span>)];
 <span class="kw">const </span>RESET_KEYS: [KeyCode; <span class="number">2</span>] = [KeyCode::Char(<span class="string">'r'</span>), KeyCode::Char(<span class="string">'R'</span>)];
-<span class="kw">pub struct </span>Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; {
+<span class="kw">pub struct </span>Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>: <span class="lifetime">'b</span>&gt; {
     speed: Speed,
     serpent: Arc&lt;RwLock&lt;SnakeBody&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;,
     direction: Arc&lt;RwLock&lt;Direction&gt;&gt;,
-    <span class="comment">//NB: if does not want to clone later, use only Arc&lt;Map&gt; (immuable)
-    </span>carte: Arc&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;,
+    <span class="comment">//NB: As we want resizable map RwLock, otherwise use only Arc&lt;Map&gt; (immuable)
+    </span>carte: Arc&lt;RwLock&lt;Map&lt;<span class="lifetime">'b</span>&gt;&gt;&gt;,
     <span class="comment">// states and game metrics (life etc.)
     </span>state: Arc&lt;RwLock&lt;GameState&gt;&gt;,
     <span class="comment">//Fruits
     </span>fruits_manager: Arc&lt;RwLock&lt;FruitsManager&lt;<span class="lifetime">'c</span>, <span class="lifetime">'b</span>&gt;&gt;&gt;,
     terminal: DefaultTerminal,
 }
-
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; {
+<span class="comment">//'c must outlive 'b as, 'c (fruits manager) uses in intern the map with lock on it.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; {
     <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(
         speed: Speed,
@@ -351,7 +383,7 @@
         fruits_nb: u16,
         terminal: DefaultTerminal,
     ) -&gt; Game&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>, <span class="lifetime">'c</span>&gt; {
-        <span class="kw">let </span>arc_carte = Arc::new(carte);
+        <span class="kw">let </span>arc_carte = Arc::new(RwLock::new(carte));
         Game {
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
@@ -367,6 +399,13 @@
     }
     <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>rendering_break = <span class="bool-val">false</span>;
+        <span class="comment">//position to render elements
+        </span><span class="kw">let </span>fps_rect = Rect::new(<span class="number">120</span>, <span class="number">0</span>, <span class="number">55</span>, <span class="number">1</span>);
+        <span class="kw">let </span>score_rect = Rect::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>);
+        <span class="kw">let </span>life_rect = Rect::new(<span class="number">40</span>, <span class="number">0</span>, <span class="number">60</span>, <span class="number">1</span>);
+        <span class="comment">//better to pre-format string than doing it each time
+        </span><span class="kw">let </span>speed_text = <span class="macro">format!</span>(<span class="string">"Speed: {}"</span>, <span class="self">self</span>.speed.get_symbol());
+        <span class="kw">let </span><span class="kw-2">mut </span>need_carte_resize = <span class="bool-val">false</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>frame_count = <span class="number">0f64</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>start_time = std::time::Instant::now();
         <span class="lifetime">'render_loop</span>: <span class="kw">loop </span>{
@@ -381,17 +420,29 @@
             //for text display: https://ratatui.rs/recipes/render/display-text/
             </span><span class="self">self</span>.terminal
                 .draw(|frame| {
+                    <span class="kw">let </span>area = frame.area();
                     <span class="comment">//maps
-                    </span>frame.render_widget(<span class="self">self</span>.carte.get_widget(), <span class="kw-2">*</span><span class="self">self</span>.carte.area());
+                    </span>{
+                        <span class="comment">//sub scope to release the lock faster
+                        </span><span class="kw">let </span>map_guard = <span class="self">self</span>.carte.read().unwrap();
+                        <span class="kw">let </span>area_map = map_guard.area();
+                        frame.render_widget(map_guard.get_widget(), <span class="kw-2">*</span>area_map);
+                        <span class="kw">if </span>area.height != area_map.height || area.width != area_map.width {
+                            need_carte_resize = <span class="bool-val">true</span>;
+                        }
+                    }
+                    <span class="comment">//remember: cannot unlock in the same scope twice (even less write/read)
+                    // so use boolean to limit the number of unlocking
+                    </span><span class="kw">if </span>need_carte_resize {
+                        <span class="self">self</span>.carte.write().unwrap().resize_to_terminal(area);
+                    }
                     <span class="comment">//FPS &amp; snake speed
                     </span>frame.render_widget(
                         Paragraph::new(<span class="macro">format!</span>(
-                            <span class="string">"Speed: {} {} Mean FPS: {} "</span>,
-                            <span class="self">self</span>.speed.get_name(),
-                            <span class="self">self</span>.speed.get_symbol(),
+                            <span class="string">"{speed_text} FPS: {} "</span>,
                             (frame_count / start_time.elapsed().as_secs_f64()).floor()
                         )),
-                        Rect::new(<span class="number">120</span>, <span class="number">0</span>, <span class="number">55</span>, <span class="number">1</span>),
+                        fps_rect.clamp(frame.area()),
                     );
                     <span class="comment">//sub scope to release the lock faster
                     </span>{
@@ -399,24 +450,29 @@
                         <span class="comment">//score
                         </span>frame.render_widget(
                             Paragraph::new(<span class="macro">format!</span>(<span class="string">" Score: {} "</span>, state_guard.score)),
-                            Rect::new(<span class="number">20</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>),
+                            score_rect.clamp(area),
                         );
                         <span class="comment">//life
                         </span><span class="kw">let </span>life = state_guard.life <span class="kw">as </span>usize;
                         frame.render_widget(
-                            Paragraph::new(<span class="macro">format!</span>(<span class="string">" life: {} "</span>, <span class="string">"❤️ "</span>.repeat(life))),
-                            <span class="attr">#[allow(clippy::cast_possible_truncation)]
-                            </span>Rect::new(<span class="number">40</span>, <span class="number">0</span>, (<span class="number">10 </span>* life) <span class="kw">as </span>u16, <span class="number">1</span>),
+                            Paragraph::new(<span class="kw">if </span>life &gt; <span class="number">5 </span>{
+                                <span class="string">" life: ❤️❤️❤️❤️❤️... "</span>.to_string()
+                            } <span class="kw">else </span>{
+                                <span class="macro">format!</span>(<span class="string">" life: {} "</span>, <span class="string">"❤️ "</span>.repeat(life))
+                            }),
+                            life_rect.clamp(frame.area()),
                         );
                     }
                     <span class="comment">//serpent //circle bad on not squared terminal =&gt; use emoji with position
                     </span>{
-                        <span class="comment">//NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        <span class="comment">//NB: to have lighter code,we could implement Widget on custom Type wrapper
+                        //over RwLock using the NewType Pattern to overcome the Orphan Rule
                         </span><span class="kw">let </span>snake_read = <span class="self">self</span>.serpent.read().unwrap(); <span class="comment">// Read lock
                         </span>frame.render_widget(<span class="kw-2">&amp;*</span>snake_read, frame.area());
                     }
                     {
-                        <span class="comment">//NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        <span class="comment">//NB: to have lighter code, we could implement Widget on custom Type wrapper
+                        // over RwLock using the NewType Pattern to overcome the Orphan Rule
                         </span><span class="kw">let </span>fruits_manager_read = <span class="self">self</span>.fruits_manager.read().unwrap(); <span class="comment">// Read lock
                         </span>frame.render_widget(<span class="kw-2">&amp;*</span>fruits_manager_read, frame.area());
                     }
@@ -446,13 +502,13 @@
                 </span><span class="kw">break </span><span class="lifetime">'render_loop</span>;
             }
             <span class="comment">//If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            </span>thread::sleep(Duration::from_millis(<span class="number">12</span>));
+            </span>sleep(Duration::from_millis(<span class="number">12</span>));
         }
     }
     <span class="kw">pub fn </span>greeting(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
-        greeting(<span class="kw-2">&amp;mut </span><span class="self">self</span>.terminal);
         <span class="kw">let </span><span class="kw-2">mut </span>rules_understood = <span class="bool-val">false</span>;
         <span class="kw">while </span>!rules_understood {
+            greeting(<span class="kw-2">&amp;mut </span><span class="self">self</span>.terminal);
             <span class="kw">if let </span>event::Event::Key(key) = event::read().expect(<span class="string">"Error reading key event"</span>) {
                 <span class="kw">if </span>key.kind == KeyEventKind::Press {
                     <span class="kw">if </span>key.code == KeyCode::Left
@@ -491,7 +547,7 @@
         // or share as normal variable by copy
         </span><span class="kw">let </span>game_speed = <span class="self">self</span>.speed.get_speed();
         <span class="kw">let </span>speed_score_modifier = <span class="self">self</span>.speed.get_score_modifier();
-        <span class="comment">//In a scope to have auto cleaning by auto join at end of main thread
+        <span class="comment">//In a scope to have auto cleaning by auto join at the end of the main thread
         </span>thread::scope(|s| {
             <span class="comment">// Game logic thread
             </span>s.spawn(<span class="kw">move </span>|| {
@@ -513,7 +569,14 @@
         });
     }
 }
-<span class="kw">pub fn </span>input_loop(direction: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;Direction&gt;&gt;, gs: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;GameState&gt;&gt;) {
+<span class="doccomment">/// You cannot block middle-click paste/scroll behavior from inside your Rust TUI app.
+</span><span class="comment">//
+// If you really want to disable it:
+//
+// You would have to modify user system settings or terminal emulator config (e.g., in alacritty, kitty, gnome-terminal, etc.)
+//
+// That is outside the app’s control
+</span><span class="kw">pub fn </span>input_loop(direction: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;Direction&gt;&gt;, gs: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;GameState&gt;&gt;) {
     <span class="kw">loop </span>{
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(event::Event::Key(key)) = event::read() {
             <span class="kw">if </span>key.kind == KeyEventKind::Press {
@@ -554,13 +617,13 @@
     direction: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;Direction&gt;&gt;,
     snake: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;SnakeBody&gt;&gt;,
     gs: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;GameState&gt;&gt;,
-    carte: <span class="kw-2">&amp;</span>Arc&lt;Map&gt;,
+    carte: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;Map&gt;&gt;,
     fruits_manager: <span class="kw-2">&amp;</span>Arc&lt;RwLock&lt;FruitsManager&gt;&gt;,
     (game_speed, speed_score_modifier): (u64, u16),
 ) {
     <span class="kw">let </span><span class="kw-2">mut </span>gsc;
     <span class="kw">loop </span>{
-        <span class="comment">//do not want to keep the lock for too long + cannot hold in same thread 2 time the same hold
+        <span class="comment">//do not want to keep the lock for too long + cannot hold in same thread 2 times the same hold
         // so match a clone, or use a let
         </span>gsc = gs.read().unwrap().status.clone();
         <span class="comment">//dead snakes tell no tales, nor move :p
@@ -568,7 +631,7 @@
             GameStatus::Playing =&gt; {
                 <span class="comment">//Check if we have move without biting ourselves (Err), and getting head position after the move
                 </span><span class="kw">let </span><span class="kw-2">mut </span>write_guard = snake.write().unwrap();
-                <span class="kw">let </span>movement = write_guard.ramp(<span class="kw-2">&amp;</span>direction.read().unwrap(), carte);
+                <span class="kw">let </span>movement = write_guard.ramp(<span class="kw-2">&amp;</span>direction.read().unwrap(), <span class="kw-2">&amp;</span>carte.read().unwrap());
                 <span class="kw">if let </span><span class="prelude-val">Ok</span>(position) = movement {
                     <span class="comment">//In two steps to leverage the power of multiple read in // whereas we have only one write
                     //did you find out a fruit ?
@@ -609,7 +672,8 @@
                 gs.write().unwrap().reset();
                 snake.write().unwrap().reset();
                 <span class="kw-2">*</span>direction.write().unwrap() = Direction::Left;
-            }
+                <span class="comment">//graphical resize on rendering part (not really a game constant)
+            </span>}
             GameStatus::ByeBye =&gt; <span class="kw">break</span>,
             <span class="kw">_ </span>=&gt; {}
         }

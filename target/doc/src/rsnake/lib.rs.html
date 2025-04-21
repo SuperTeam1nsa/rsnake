@@ -75,8 +75,7 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a></pre></div><pre class="rust"><code><span class="attr">#![deny(clippy::all)]
+<a href="#77" id="77">77</a></pre></div><pre class="rust"><code><span class="attr">#![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 </span><span class="comment">//to have all Clippy lints see https://github.com/rust-lang/rust-clippy/
 </span><span class="doccomment">//! # Snake Game using Ratatui
@@ -136,9 +135,8 @@
     <span class="kw">let </span>case_size = <span class="number">2</span>;
     <span class="kw">let </span>velocity = args.velocity;
 
-    <span class="kw">let </span>ini_position = Position { x: <span class="number">80</span>, y: <span class="number">5 </span>};
+    <span class="kw">let </span>ini_position = Position { x: <span class="number">50</span>, y: <span class="number">5 </span>};
     <span class="kw">let </span><span class="kw-2">mut </span>terminal = ratatui::init();
-
     <span class="kw">let </span>map: Carte = Carte::new(case_size, terminal.get_frame().area());
     <span class="kw">let </span>speed: Speed = Speed::new(<span class="kw-2">&amp;</span>velocity);
 

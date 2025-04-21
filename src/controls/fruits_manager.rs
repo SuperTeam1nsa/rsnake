@@ -7,13 +7,13 @@
 //! ```rust
 //! use rsnake::game::FruitsManager;
 //! use rsnake::graphics::map::Map;
-//! use std::sync::Arc;
+//! use std::sync::{Arc, RwLock};
 //! use ratatui::layout::Rect;
 //! use rsnake::graphics::graphic_block::Position;
 //!
 //! let case_size = 2;
 //! let map_size = Rect::new(0, 0, 200, 10);
-//! let map = Arc::new(Map::new(case_size, map_size));
+//! let map = Arc::new(RwLock::new(Map::new(case_size, map_size)));
 //! let number_of_fruits_to_manage = 10;
 //! let mut manager = FruitsManager::new(number_of_fruits_to_manage, map.clone());
 //!
@@ -34,32 +34,36 @@ use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::prelude::Widget;
 use ratatui::widgets::WidgetRef;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 /// Manages fruit objects within the game.
 pub struct FruitsManager<'a, 'b: 'a> {
-    fruits: Vec<Fruit<'a>>, // List of fruits currently in the game
-    carte: Arc<Map<'b>>,    // Reference to the game map
+    fruits: Vec<Fruit<'a>>,      // List of fruits currently in the game
+    carte: Arc<RwLock<Map<'b>>>, // Reference to the game map
 }
 
 impl<'a, 'b> FruitsManager<'a, 'b> {
     /// Creates a new `FruitsManager` with a given number of fruits.
-    ///
+    /// # Panics
+    /// if guard cannot be got for Map (whenever a previous panic poisoned guard)
     /// # Example
     /// ```
-    /// use std::sync::Arc;
+    /// use std::sync::{Arc, RwLock};
     /// use ratatui::layout::Rect;
     /// use rsnake::game::FruitsManager;
     /// use rsnake::graphics::map::Map;
     /// let x =42;
-    /// let map = Arc::new(Map::new(2, Rect::new(0,0, 160,10)));
+    /// let map = Arc::new(RwLock::new(Map::new(2, Rect::new(0,0, 160,10))));
     /// let manager = FruitsManager::new(3, map);
     /// ```
     #[must_use]
-    pub fn new(nb: u16, carte: Arc<Map<'b>>) -> Self {
+    pub fn new(nb: u16, carte: Arc<RwLock<Map<'b>>>) -> Self {
         let mut fruits: Vec<Fruit> = Vec::with_capacity(nb as usize);
-        for _ in 0..nb {
-            fruits.push(Self::spawn_random(&carte));
+        {
+            let c = carte.read().unwrap();
+            for _ in 0..nb {
+                fruits.push(Self::spawn_random(&c));
+            }
         }
         Self { fruits, carte }
     }
@@ -82,12 +86,17 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     }
 
     /// Replaces eaten fruits with new random ones and ensures balance.
+    /// # Panics
+    /// if guard cannot be got for Map (whenever a previous panic poisoned guard)
     pub fn replace_fruits(&mut self, fruits_to_remove: &[Fruit<'a>]) {
         let nb = fruits_to_remove.len();
         self.fruits
             .retain(|fruit| !fruits_to_remove.contains(fruit));
-        for _ in 0..nb {
-            self.fruits.push(Self::spawn_random(&self.carte));
+        {
+            let carte_guard = self.carte.read().unwrap();
+            for _ in 0..nb {
+                self.fruits.push(Self::spawn_random(&carte_guard));
+            }
         }
     }
 
@@ -146,10 +155,10 @@ mod tests {
     use super::*;
     use std::sync::Arc;
 
-    // Mock definitions – Not really need there, but for example on how to share ressources for test
-    // Arc because tests are by default multi-htreaded (can be changed if need with : )
-    fn mock_map() -> Arc<Map<'static>> {
-        Arc::new(Map::new(2, Rect::new(0, 0, 160, 12)))
+    /// Mock definitions
+    /// Not really need it there,but for example, on how to share ressources for test
+    fn mock_map() -> Arc<RwLock<Map<'static>>> {
+        Arc::new(RwLock::new(Map::new(2, Rect::new(0, 0, 160, 12))))
     }
 
     fn dummy_position() -> Position {

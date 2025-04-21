@@ -44,7 +44,7 @@ fn test_cli_runs_with_default_args() {
         .arg("4")
         .timeout(std::time::Duration::from_secs(5))
         .assert()
-        .stdout(contains("Welcome to the craziest Snake ever!"))
+        .stdout(contains("Have a good game !"))
         .stderr(contains("")); // timeout à 5s
 
     let elapsed = now.elapsed();
