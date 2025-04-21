@@ -45,6 +45,7 @@ impl GameState {
     ///
     /// # Returns
     /// A new instance of `GameState` with default values.
+    #[must_use]
     pub fn new(life: u16) -> Self {
         Self {
             life,

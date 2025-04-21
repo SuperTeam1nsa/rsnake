@@ -19,19 +19,19 @@ use std::time::Duration;
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
 const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
-pub struct Game<'a, 'b, 'c> {
+pub struct Game<'a, 'b, 'c: 'b> {
     speed: Speed,
     serpent: Arc<RwLock<SnakeBody<'a>>>,
     direction: Arc<RwLock<Direction>>,
-    //NB: if does not want to clone later, use only Arc<Map> (immuable)
-    carte: Arc<Map<'b>>,
+    //NB: As we want resizable map RwLock, otherwise use only Arc<Map> (immuable)
+    carte: Arc<RwLock<Map<'b>>>,
     // states and game metrics (life etc.)
     state: Arc<RwLock<GameState>>,
     //Fruits
     fruits_manager: Arc<RwLock<FruitsManager<'c, 'b>>>,
     terminal: DefaultTerminal,
 }
-
+//'c must outlive 'b as, 'c (fruits manager) uses in intern the map with lock on it.
 impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     #[must_use]
     pub fn new(
@@ -42,7 +42,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         fruits_nb: u16,
         terminal: DefaultTerminal,
     ) -> Game<'a, 'b, 'c> {
-        let arc_carte = Arc::new(carte);
+        let arc_carte = Arc::new(RwLock::new(carte));
         Game {
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
@@ -58,6 +58,13 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     }
     pub fn render(&mut self) {
         let mut rendering_break = false;
+        //position to render elements
+        let fps_rect = Rect::new(120, 0, 55, 1);
+        let score_rect = Rect::new(10, 0, 15, 1);
+        let life_rect = Rect::new(40, 0, 60, 1);
+        //better to pre-format string than doing it each time
+        let speed_text = format!("Speed: {}", self.speed.get_symbol());
+        let mut need_carte_resize = false;
         let mut frame_count = 0f64;
         let mut start_time = std::time::Instant::now();
         'render_loop: loop {
@@ -72,17 +79,29 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
             //for text display: https://ratatui.rs/recipes/render/display-text/
             self.terminal
                 .draw(|frame| {
+                    let area = frame.area();
                     //maps
-                    frame.render_widget(self.carte.get_widget(), *self.carte.area());
+                    {
+                        //sub scope to release the lock faster
+                        let map_guard = self.carte.read().unwrap();
+                        let area_map = map_guard.area();
+                        frame.render_widget(map_guard.get_widget(), *area_map);
+                        if area.height != area_map.height || area.width != area_map.width {
+                            need_carte_resize = true;
+                        }
+                    }
+                    //remember: cannot unlock in the same scope twice (even less write/read)
+                    // so use boolean to limit the number of unlocking
+                    if need_carte_resize {
+                        self.carte.write().unwrap().resize_to_terminal(area);
+                    }
                     //FPS & snake speed
                     frame.render_widget(
                         Paragraph::new(format!(
-                            "Speed: {} {} Mean FPS: {} ",
-                            self.speed.get_name(),
-                            self.speed.get_symbol(),
+                            "{speed_text} FPS: {} ",
                             (frame_count / start_time.elapsed().as_secs_f64()).floor()
                         )),
-                        Rect::new(120, 0, 55, 1),
+                        fps_rect.clamp(frame.area()),
                     );
                     //sub scope to release the lock faster
                     {
@@ -90,24 +109,29 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                         //score
                         frame.render_widget(
                             Paragraph::new(format!(" Score: {} ", state_guard.score)),
-                            Rect::new(20, 0, 15, 1),
+                            score_rect.clamp(area),
                         );
                         //life
                         let life = state_guard.life as usize;
                         frame.render_widget(
-                            Paragraph::new(format!(" life: {} ", "❤️ ".repeat(life))),
-                            #[allow(clippy::cast_possible_truncation)]
-                            Rect::new(40, 0, (10 * life) as u16, 1),
+                            Paragraph::new(if life > 5 {
+                                " life: ❤️❤️❤️❤️❤️... ".to_string()
+                            } else {
+                                format!(" life: {} ", "❤️ ".repeat(life))
+                            }),
+                            life_rect.clamp(frame.area()),
                         );
                     }
                     //serpent //circle bad on not squared terminal => use emoji with position
                     {
-                        //NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        //NB: to have lighter code,we could implement Widget on custom Type wrapper
+                        //over RwLock using the NewType Pattern to overcome the Orphan Rule
                         let snake_read = self.serpent.read().unwrap(); // Read lock
                         frame.render_widget(&*snake_read, frame.area());
                     }
                     {
-                        //NB: to have lighter code we could implement Widget on custom Type wrapper over RwLock using the NewType Pattern to overcome the Orphan Rule
+                        //NB: to have lighter code, we could implement Widget on custom Type wrapper
+                        // over RwLock using the NewType Pattern to overcome the Orphan Rule
                         let fruits_manager_read = self.fruits_manager.read().unwrap(); // Read lock
                         frame.render_widget(&*fruits_manager_read, frame.area());
                     }
@@ -137,13 +161,13 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 break 'render_loop;
             }
             //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            thread::sleep(Duration::from_millis(12));
+            sleep(Duration::from_millis(12));
         }
     }
     pub fn greeting(&mut self) -> bool {
-        greeting(&mut self.terminal);
         let mut rules_understood = false;
         while !rules_understood {
+            greeting(&mut self.terminal);
             if let event::Event::Key(key) = event::read().expect("Error reading key event") {
                 if key.kind == KeyEventKind::Press {
                     if key.code == KeyCode::Left
@@ -182,7 +206,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         // or share as normal variable by copy
         let game_speed = self.speed.get_speed();
         let speed_score_modifier = self.speed.get_score_modifier();
-        //In a scope to have auto cleaning by auto join at end of main thread
+        //In a scope to have auto cleaning by auto join at the end of the main thread
         thread::scope(|s| {
             // Game logic thread
             s.spawn(move || {
@@ -204,6 +228,13 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         });
     }
 }
+/// You cannot block middle-click paste/scroll behavior from inside your Rust TUI app.
+//
+// If you really want to disable it:
+//
+// You would have to modify user system settings or terminal emulator config (e.g., in alacritty, kitty, gnome-terminal, etc.)
+//
+// That is outside the app’s control
 pub fn input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<GameState>>) {
     loop {
         if let Ok(event::Event::Key(key)) = event::read() {
@@ -245,13 +276,13 @@ pub fn logic_loop(
     direction: &Arc<RwLock<Direction>>,
     snake: &Arc<RwLock<SnakeBody>>,
     gs: &Arc<RwLock<GameState>>,
-    carte: &Arc<Map>,
+    carte: &Arc<RwLock<Map>>,
     fruits_manager: &Arc<RwLock<FruitsManager>>,
     (game_speed, speed_score_modifier): (u64, u16),
 ) {
     let mut gsc;
     loop {
-        //do not want to keep the lock for too long + cannot hold in same thread 2 time the same hold
+        //do not want to keep the lock for too long + cannot hold in same thread 2 times the same hold
         // so match a clone, or use a let
         gsc = gs.read().unwrap().status.clone();
         //dead snakes tell no tales, nor move :p
@@ -259,7 +290,7 @@ pub fn logic_loop(
             GameStatus::Playing => {
                 //Check if we have move without biting ourselves (Err), and getting head position after the move
                 let mut write_guard = snake.write().unwrap();
-                let movement = write_guard.ramp(&direction.read().unwrap(), carte);
+                let movement = write_guard.ramp(&direction.read().unwrap(), &carte.read().unwrap());
                 if let Ok(position) = movement {
                     //In two steps to leverage the power of multiple read in // whereas we have only one write
                     //did you find out a fruit ?
@@ -300,6 +331,7 @@ pub fn logic_loop(
                 gs.write().unwrap().reset();
                 snake.write().unwrap().reset();
                 *direction.write().unwrap() = Direction::Left;
+                //graphical resize on rendering part (not really a game constant)
             }
             GameStatus::ByeBye => break,
             _ => {}

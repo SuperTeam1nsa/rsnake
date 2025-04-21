@@ -39,6 +39,10 @@ impl Map<'_> {
             viewport,
         }
     }
+    /// To resize the map viewport, not for in game use # unfair, but when after restarting it is OK
+    pub fn resize_to_terminal(&mut self, viewport: Rect) {
+        self.viewport = viewport;
+    }
 
     /// Determines if a given position is outside the bounds of the map.
     ///

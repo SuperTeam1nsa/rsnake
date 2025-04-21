@@ -179,7 +179,8 @@ impl<'a> SnakeBody<'a> {
     /// # Parameters
     /// - `nb`:The number of segments to add or to remove to the snake's body.
     /// # Panics
-    /// If no element in Snake, as we keep a minimum size (size_ini when resizing dow, should not happen
+    /// If no element in Snake, as we keep a minimum size `size_ini`,
+    /// when resizing down should not happen
     pub fn relative_size_change(&mut self, nb: i16) {
         if nb > 0 {
             for _ in 0..nb {

@@ -234,7 +234,8 @@
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::controls::direction::Direction;
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::controls::direction::Direction;
 <span class="kw">use </span><span class="kw">crate</span>::graphics::graphic_block::{GraphicBlock, Position};
 <span class="kw">use </span><span class="kw">crate</span>::graphics::map::Map;
 <span class="kw">use </span>ratatui::buffer::Buffer;
@@ -415,7 +416,8 @@
     /// # Parameters
     /// - `nb`:The number of segments to add or to remove to the snake's body.
     /// # Panics
-    /// If no element in Snake, as we keep a minimum size (size_ini when resizing dow, should not happen
+    /// If no element in Snake, as we keep a minimum size `size_ini`,
+    /// when resizing down should not happen
     </span><span class="kw">pub fn </span>relative_size_change(<span class="kw-2">&amp;mut </span><span class="self">self</span>, nb: i16) {
         <span class="kw">if </span>nb &gt; <span class="number">0 </span>{
             <span class="kw">for _ in </span><span class="number">0</span>..nb {

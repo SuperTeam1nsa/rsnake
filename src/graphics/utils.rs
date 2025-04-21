@@ -1,7 +1,13 @@
+use crate::controls::speed;
+use crate::game::Speed;
+use crate::graphics::fruit::FRUITS_SCORES_PROBABILITIES;
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::text::{Line, Text};
 use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::DefaultTerminal;
+use std::thread::sleep;
+use std::time::Duration;
+
 // /Use AI or a generator as : http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Pause
 const GAME_OVER_TEXT: &str = "\n\
              ██████╗  █████╗ ███╗   ███╗███████╗       ██████╗ ██╗   ██╗███████╗██████╗ \n\
@@ -55,9 +61,7 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
     //terminal.clear().expect("Unusable terminal clear");
     terminal
         .draw(|frame| {
-            //more idiomatic using lines (as in :https://ratatui.rs/recipes/render/display-text/)
-            //can mix style inside the same line using Line::from(vec!["hello".green(), " ".into(), "world".green().bold(), "3".into()]),
-            let text = Text::from(vec![
+            let lines = vec![
                 Line::from("███████╗ ███╗   ██╗  █████╗  ██╗  ██╗ ███████╗"),
                 Line::from("██╔════╝ ████╗  ██║ ██╔══██╗ ██║ ██╔╝ ██╔════╝"),
                 Line::from("███████╗ ██╔██╗ ██║ ███████║ █████╔╝  █████╗  "),
@@ -65,17 +69,76 @@ pub fn greeting(terminal: &mut DefaultTerminal) {
                 Line::from("███████║ ██║ ╚████║ ██║  ██║ ██║  ██╗ ███████╗"),
                 Line::from("╚══════╝ ╚══════╝╚═ ╝  ╚═══╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝"),
                 Line::from("Welcome to the craziest Snake ever! 🐍").green(),
-                Line::from("Use ⬆️➡️⬇️⬅️  to move and start the Game ! Or 'q' to quit in game 🎮")
-                    .green(),
-            ]);
+                Line::from("+--------+-------------+-----------+------------+"),
+                Line::from("|Controls|  ⬆️➡️⬇️⬅️   |    Q      |  P / space |"),
+                Line::from("+--------+-------------+-----------+------------+"),
+                Line::from("|Effects | Move/start  | Quit game | Pause game |"),
+                Line::from("+--------+-------------+-----------+------------+"),
+                Line::from("Have a good game !  🎮").green(),
+            ];
+
             frame.render_widget(
-                Paragraph::new(text)
+                Paragraph::new(Text::from(lines))
                     .centered()
+                    .block(Block::bordered().border_type(BorderType::Double)),
+                frame.area(),
+            );
+
+            // Speed effects
+            let mut speed_lines = Vec::new();
+            let speed_tab_jonction =
+                Line::from("+------------+-------+----------------+---------+");
+            speed_lines.push(speed_tab_jonction.clone());
+            speed_lines.push(Line::from(
+                "| Speed Name | Value | Score Modifier | Symbol  |",
+            ));
+            speed_lines.push(speed_tab_jonction.clone());
+            for Speed {
+                name,
+                value,
+                score_modifier,
+                symbol,
+            } in speed::iter_speed_variants()
+            {
+                //:<10 and so on are formating options, e.g., saying aligning left with min 10 chars
+                speed_lines.push(Line::from(format!(
+                    "| {name:<10} | {value:>5} | {score_modifier:>14} | {symbol:<6} |"
+                )));
+            }
+            speed_lines.push(speed_tab_jonction);
+            frame.render_widget(
+                Paragraph::new(Text::from(speed_lines))
+                    .right_aligned()
+                    .block(Block::bordered().border_type(BorderType::Double)),
+                frame.area(),
+            );
+
+            //adding fruits rules, gonna left aligned for less screen space use
+            let mut fruits_lines = Vec::new();
+            let tab_jonction = Line::from("+---------+-------+-------------+-------------+");
+            fruits_lines.push(tab_jonction.clone());
+            fruits_lines.push(Line::from(
+                "| Fruit   | Score | Probability | Size Effect |",
+            ));
+            fruits_lines.push(tab_jonction.clone());
+            for (fruit, score, probability, size_effect) in FRUITS_SCORES_PROBABILITIES {
+                //:<6 and so on are formating options, e.g., saying aligning left with min 6 chars
+                fruits_lines.push(Line::from(format!(
+                    "| {fruit:<6} | {score:>5} | {probability:>11} | {size_effect:>11} |"
+                )));
+            }
+            fruits_lines.push(tab_jonction);
+            //more idiomatic using lines (as in :https://ratatui.rs/recipes/render/display-text/)
+            //can mix style inside the same line using Line::from(vec!["hello".green(), " ".into(), "world".green().bold(), "3".into()]),
+            frame.render_widget(
+                Paragraph::new(Text::from(fruits_lines))
+                    .left_aligned()
                     .block(Block::bordered().border_type(BorderType::Double)),
                 frame.area(),
             );
         })
         .expect("Unusable terminal render");
+    sleep(Duration::from_millis(100));
 }
 
 /// Creates a centered paragraph with text and color style

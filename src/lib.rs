@@ -58,9 +58,8 @@ pub fn start_snake() {
     let case_size = 2;
     let velocity = args.velocity;
 
-    let ini_position = Position { x: 80, y: 5 };
+    let ini_position = Position { x: 50, y: 5 };
     let mut terminal = ratatui::init();
-
     let map: Carte = Carte::new(case_size, terminal.get_frame().area());
     let speed: Speed = Speed::new(&velocity);
 
