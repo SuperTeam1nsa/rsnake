@@ -57,6 +57,8 @@ pub fn start_snake() {
 
     let case_size = 2;
     let velocity = args.velocity;
+    let caps_fps = args.caps_fps;
+    let classic = args.classic;
 
     let ini_position = Position { x: 50, y: 5 };
     let mut terminal = ratatui::init();
@@ -70,7 +72,16 @@ pub fn start_snake() {
         ini_position,
         case_size,
     );
-    let mut jeu: Jeu = game::Game::new(speed, serpent, map, args.life, args.nb_of_fruit, terminal);
+    let mut jeu: Jeu = game::Game::new(
+        classic,
+        caps_fps,
+        speed,
+        serpent,
+        map,
+        args.life,
+        args.nb_of_fruit,
+        terminal,
+    );
 
     jeu.start();
     ratatui::restore();

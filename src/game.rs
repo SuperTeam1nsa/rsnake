@@ -14,12 +14,14 @@ use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
 use std::thread;
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
 const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
 pub struct Game<'a, 'b, 'c: 'b> {
+    classic_mode: bool,
+    caps_fps: bool,
     speed: Speed,
     serpent: Arc<RwLock<SnakeBody<'a>>>,
     direction: Arc<RwLock<Direction>>,
@@ -35,6 +37,8 @@ pub struct Game<'a, 'b, 'c: 'b> {
 impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     #[must_use]
     pub fn new(
+        classic_mode: bool,
+        caps_fps: bool,
         speed: Speed,
         serpent: SnakeBody<'a>,
         carte: Map<'b>,
@@ -44,6 +48,8 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     ) -> Game<'a, 'b, 'c> {
         let arc_carte = Arc::new(RwLock::new(carte));
         Game {
+            classic_mode,
+            caps_fps,
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
             direction: Arc::new(RwLock::new(Direction::Right)),
@@ -59,20 +65,24 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     pub fn render(&mut self) {
         let mut rendering_break = false;
         //position to render elements
-        let fps_rect = Rect::new(120, 0, 55, 1);
+        //will be clamped to the frame area border anyway, 9999 to go to the last line
+        //allow easy resizing
+        let fps_rect = Rect::new(1, 9999, 55, 1);
         let score_rect = Rect::new(10, 0, 15, 1);
         let life_rect = Rect::new(40, 0, 60, 1);
         //better to pre-format string than doing it each time
         let speed_text = format!("Speed: {}", self.speed.get_symbol());
         let mut need_carte_resize = false;
         let mut frame_count = 0f64;
-        let mut start_time = std::time::Instant::now();
+        let mut start_windows_time = std::time::Instant::now();
+        let mut start_frame_time: Instant;
         'render_loop: loop {
+            start_frame_time = Instant::now();
             frame_count += 1.0;
             //windows for frame calcul
             if frame_count >= 1_000.0 {
                 frame_count = 1.0;
-                start_time = std::time::Instant::now();
+                start_windows_time = std::time::Instant::now();
             }
             //
             //if self.serpent.read().unwrap().is_alive {
@@ -94,12 +104,14 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                     // so use boolean to limit the number of unlocking
                     if need_carte_resize {
                         self.carte.write().unwrap().resize_to_terminal(area);
+                        self.fruits_manager.write().unwrap().resize_to_terminal();
+                        need_carte_resize = false;
                     }
                     //FPS & snake speed
                     frame.render_widget(
                         Paragraph::new(format!(
                             "{speed_text} FPS: {} ",
-                            (frame_count / start_time.elapsed().as_secs_f64()).floor()
+                            (frame_count / start_windows_time.elapsed().as_secs_f64()).floor()
                         )),
                         fps_rect.clamp(frame.area()),
                     );
@@ -160,8 +172,10 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 //nice labeled loop :)
                 break 'render_loop;
             }
-            //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering)
-            sleep(Duration::from_millis(12));
+            //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering and measured s time elapsed)
+            if self.caps_fps {
+                sleep(Duration::from_millis(16).saturating_sub(start_frame_time.elapsed()));
+            }
         }
     }
     pub fn greeting(&mut self) -> bool {
@@ -206,6 +220,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         // or share as normal variable by copy
         let game_speed = self.speed.get_speed();
         let speed_score_modifier = self.speed.get_score_modifier();
+        let classic = self.classic_mode;
         //In a scope to have auto cleaning by auto join at the end of the main thread
         thread::scope(|s| {
             // Game logic thread
@@ -216,7 +231,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                     &logic_gs,
                     &carte,
                     &fruits_manager,
-                    (game_speed, speed_score_modifier),
+                    (game_speed, speed_score_modifier, classic),
                 );
             });
             // input logic thread
@@ -278,7 +293,7 @@ pub fn logic_loop(
     gs: &Arc<RwLock<GameState>>,
     carte: &Arc<RwLock<Map>>,
     fruits_manager: &Arc<RwLock<FruitsManager>>,
-    (game_speed, speed_score_modifier): (u64, u16),
+    (game_speed, speed_score_modifier, classic_mode): (u64, u16, bool),
 ) {
     let mut gsc;
     loop {
@@ -305,7 +320,7 @@ pub fn logic_loop(
                             .iter()
                             .map(super::graphics::fruit::Fruit::get_grow_snake)
                             .sum::<i16>();
-                        if score_fruits >= 0 {
+                        if !classic_mode || (classic_mode && size_effect > 0) {
                             write_guard.relative_size_change(size_effect);
                         }
                         //NB:qConverting a u16 to an i32 is always safe in Rust because the range of u16 (0 to 65,535)
