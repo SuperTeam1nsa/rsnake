@@ -63,8 +63,9 @@ impl Map<'_> {
     /// ```
     #[must_use]
     pub fn out_of_map(&self, Position { x, y }: &Position) -> bool {
-        let x_max = self.viewport.width - self.case_size;
-        let y_max = self.viewport.height - (self.case_size / 2);
+        //*2 to put out the bordered map (last case being ==== )
+        let x_max = self.viewport.width - (self.case_size * 2);
+        let y_max = self.viewport.height - self.case_size;
         let x_min = self.case_size;
         let y_min = self.case_size / 2;
         *x < x_min || *x > x_max || *y < y_min || *y > y_max
@@ -91,8 +92,9 @@ impl Map<'_> {
     /// ```
     #[must_use]
     pub fn out_of_map_reverse_position(&self, Position { x, y }: &Position) -> Position {
-        let x_max = self.viewport.width - self.case_size;
-        let y_max = self.viewport.height - (self.case_size / 2);
+        //*2 to put out the bordered map (last case being ==== )
+        let x_max = self.viewport.width - (self.case_size * 2);
+        let y_max = self.viewport.height - self.case_size;
         let x_min = self.case_size;
         let y_min = self.case_size / 2;
         if *y > y_max {

@@ -71,4 +71,20 @@ pub struct Cli {
         help = "Defines the number of fruits available in the game at once."
     )]
     pub nb_of_fruit: u16,
+
+    /// Caps to 60 FPS or not
+    #[arg(
+        short,
+        long,
+        default_value_t = true,
+        help = "Set to false to uncaps default FPS limit (to 60 FPS)"
+    )]
+    pub caps_fps: bool,
+    /// Classic game with only growing snake
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Classic game with only growing snake, so fruits with negative size effect will have no size effect"
+    )]
+    pub classic: bool,
 }

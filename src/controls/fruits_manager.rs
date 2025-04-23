@@ -28,7 +28,6 @@
 use crate::graphics::fruit::{Fruit, FRUITS_SCORES_PROBABILITIES};
 use crate::graphics::graphic_block::Position;
 use crate::graphics::map::Map;
-use rand::prelude::ThreadRng;
 use rand::{rng, Rng};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -70,8 +69,8 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
 
     /// Spawns a fruit at a random position on the map.
     fn spawn_random(carte: &Map) -> Fruit<'a> {
+        let position = Self::generate_position_rounded_by_cs(carte);
         let mut rng = rng();
-        let position = Self::generate_position_rounded_by_cs(carte, &mut rng);
         let random_value: u16 = rng.random_range(1..100);
         let mut cumulative_probability = 0;
         for &(image, score, probability, size_effect) in FRUITS_SCORES_PROBABILITIES {
@@ -113,7 +112,8 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     }
 
     /// Generates a random valid position for spawning fruits.
-    fn generate_position_rounded_by_cs(carte: &Map, rng: &mut ThreadRng) -> Position {
+    fn generate_position_rounded_by_cs(carte: &Map) -> Position {
+        let mut rng = rng();
         let cs = carte.get_case_size();
         let csy = cs / 2;
         let width = carte.area().width;
@@ -123,6 +123,14 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
         Position {
             x: rng.random_range(1..max_index_x) * cs,
             y: rng.random_range(1..max_index_y) * csy,
+        }
+    }
+    pub(crate) fn resize_to_terminal(&mut self) {
+        //change the position of all fruits to avoid no eatable/unreachable fruits
+        for f in &mut self.fruits {
+            f.set_position(Self::generate_position_rounded_by_cs(
+                &self.carte.read().unwrap(),
+            ));
         }
     }
 }

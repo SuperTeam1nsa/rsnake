@@ -70,6 +70,10 @@ impl<'a> Fruit<'a> {
     pub fn is_at_position(&self, position: &Position) -> bool {
         self.graphic_block.get_position() == position
     }
+    /// Checks if the fruit is at a specific position.
+    pub fn set_position(&mut self, position: Position) {
+        self.graphic_block.set_position(position);
+    }
 
     /// Returns the score of the fruit.
     #[must_use]
