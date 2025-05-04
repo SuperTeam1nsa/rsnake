@@ -37,13 +37,10 @@ pub struct Game<'a, 'b, 'c: 'b> {
 impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     #[must_use]
     pub fn new(
-        classic_mode: bool,
-        caps_fps: bool,
+        (classic_mode, caps_fps, life, fruits_nb): (bool, bool, u16, u16),
         speed: Speed,
         serpent: SnakeBody<'a>,
         carte: Map<'b>,
-        life: u16,
-        fruits_nb: u16,
         terminal: DefaultTerminal,
     ) -> Game<'a, 'b, 'c> {
         let arc_carte = Arc::new(RwLock::new(carte));
