@@ -73,13 +73,10 @@ pub fn start_snake() {
         case_size,
     );
     let mut jeu: Jeu = game::Game::new(
-        classic,
-        caps_fps,
+        (classic, caps_fps, args.life, args.nb_of_fruit),
         speed,
         serpent,
         map,
-        args.life,
-        args.nb_of_fruit,
         terminal,
     );
 
