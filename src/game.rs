@@ -21,7 +21,7 @@ const PAUSE_KEYS: [KeyCode; 3] = [KeyCode::Char('p'), KeyCode::Char('P'), KeyCod
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
 pub struct Game<'a, 'b, 'c: 'b> {
     classic_mode: bool,
-    caps_fps: bool,
+    uncaps_fps: bool,
     speed: Speed,
     serpent: Arc<RwLock<SnakeBody<'a>>>,
     direction: Arc<RwLock<Direction>>,
@@ -37,7 +37,7 @@ pub struct Game<'a, 'b, 'c: 'b> {
 impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
     #[must_use]
     pub fn new(
-        (classic_mode, caps_fps, life, fruits_nb): (bool, bool, u16, u16),
+        (classic_mode, uncaps_fps, life, fruits_nb): (bool, bool, u16, u16),
         speed: Speed,
         serpent: SnakeBody<'a>,
         carte: Map<'b>,
@@ -46,7 +46,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         let arc_carte = Arc::new(RwLock::new(carte));
         Game {
             classic_mode,
-            caps_fps,
+            uncaps_fps,
             speed,
             serpent: Arc::new(RwLock::new(serpent)),
             direction: Arc::new(RwLock::new(Direction::Right)),
@@ -170,7 +170,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 break 'render_loop;
             }
             //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering and measured s time elapsed)
-            if self.caps_fps {
+            if !self.uncaps_fps {
                 sleep(Duration::from_millis(16).saturating_sub(start_frame_time.elapsed()));
             }
         }

@@ -76,10 +76,10 @@ pub struct Cli {
     #[arg(
         short,
         long,
-        default_value_t = true,
-        help = "Set to false to uncaps default FPS limit (to 60 FPS)"
+        default_value_t = false,
+        help = "Set to uncaps default FPS limit (by default limit 60 FPS)"
     )]
-    pub caps_fps: bool,
+    pub uncaps_fps: bool,
     /// Classic game with only growing snake
     #[arg(
         long,

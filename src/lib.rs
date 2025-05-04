@@ -57,7 +57,7 @@ pub fn start_snake() {
 
     let case_size = 2;
     let velocity = args.velocity;
-    let caps_fps = args.caps_fps;
+    let uncaps_fps = args.uncaps_fps;
     let classic = args.classic;
 
     let ini_position = Position { x: 50, y: 5 };
@@ -73,7 +73,7 @@ pub fn start_snake() {
         case_size,
     );
     let mut jeu: Jeu = game::Game::new(
-        (classic, caps_fps, args.life, args.nb_of_fruit),
+        (classic, uncaps_fps, args.life, args.nb_of_fruit),
         speed,
         serpent,
         map,
