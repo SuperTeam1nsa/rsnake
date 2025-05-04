@@ -29,6 +29,8 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - To install the game as a command:  
   `cargo install --path .`  
   And then run the game with: `rsnake`
+- To see run options, use: `rsnake --help`
+- E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥`
 
 ## Installation Long Path for Windows
 
