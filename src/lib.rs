@@ -39,33 +39,37 @@ pub mod controls;
 pub mod game_logic;
 pub mod graphics;
 
-use clap::Parser;
-use controls::speed::Speed;
-
-use crate::game_logic::playing_logic::want_to_play_greeting_screen;
 use crate::game_logic::playing_thread_manager::Game;
 use crate::graphics::graphic_block::Position;
-use crate::graphics::snake_body::SnakeBody;
+use crate::graphics::sprites::snake_body::SnakeBody;
+use clap::Parser;
 use controls::cli::Cli;
-use graphics::map::Map as Carte;
+use controls::speed::Speed;
+use graphics::sprites::map::Map as Carte;
+use ratatui::text::Span;
+use std::cmp::max;
 
 const INI_POSITION: Position = Position { x: 50, y: 5 };
-const CASE_SIZE: u16 = 2;
+/// # Panics
+/// If bad characters (invalid size) are provided for snake body or head
 pub fn start_snake() {
     // get command line options and parsed them to check for errors
     let args = Cli::parse();
     // If everything is OK, inits terminal for rendering
     let mut terminal = ratatui::init();
-    // Display greeting screen
-    if !want_to_play_greeting_screen(&mut terminal) {
-        return;
-    }
+    //ratatui using UnicodeWidthStr crates as dep
+    // get the correct case size for display
+    let case_size = u16::try_from(max(
+        Span::raw(&args.body_symbol).width(),
+        Span::raw(&args.head_symbol).width(),
+    ))
+    .expect("Bad symbol size, use a real character");
     //except if gamer want to quit from menu screen, we continue
     // set up parameters from option parsing
     let velocity = args.velocity;
     let uncaps_fps = args.uncaps_fps;
     let classic = args.classic;
-    let map: Carte = Carte::new(CASE_SIZE, terminal.get_frame().area());
+    let map: Carte = Carte::new(case_size, terminal.get_frame().area());
     let speed: Speed = Speed::new(&velocity);
 
     let serpent: SnakeBody = SnakeBody::new(
@@ -73,8 +77,9 @@ pub fn start_snake() {
         &args.head_symbol,
         args.snake_length,
         INI_POSITION,
-        CASE_SIZE,
+        case_size,
     );
+    // Display greeting screen
     let mut jeu = Game::new(
         (classic, uncaps_fps, args.life, args.nb_of_fruit),
         speed,
@@ -82,6 +87,8 @@ pub fn start_snake() {
         map,
         terminal,
     );
-    jeu.start();
+    jeu.menu();
+
+    //in all cases, restore
     ratatui::restore();
 }

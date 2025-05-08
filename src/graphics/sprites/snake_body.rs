@@ -1,10 +1,10 @@
 use crate::controls::direction::Direction;
 use crate::graphics::graphic_block::{GraphicBlock, Position};
-use crate::graphics::map::Map;
+use crate::graphics::sprites::map::Map;
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::prelude::{Style, Widget};
-use ratatui::style::Color;
+use ratatui::style::{Color, Modifier};
 use ratatui::widgets::WidgetRef;
 
 /// A struct representing the snake's body in the game.
@@ -45,7 +45,13 @@ impl<'a> SnakeBody<'a> {
         position: Position,
         case_size: u16,
     ) -> SnakeBody<'a> {
-        let snake_style = Style::default().fg(Color::Cyan);
+        let snake_style = Style {
+            fg: Some(Color::White),
+            bg: Some(Color::Reset), // <- important if the global style has bg
+            underline_color: Some(Color::White),
+            add_modifier: Modifier::ITALIC,
+            sub_modifier: Modifier::BOLD,
+        };
         let Position { x, y } = position;
         let mut body = Vec::with_capacity(nb as usize);
         body.push(GraphicBlock::new(
@@ -56,7 +62,8 @@ impl<'a> SnakeBody<'a> {
         for i in 1..nb {
             body.push(GraphicBlock::new(
                 Position {
-                    x: x - (case_size * i),
+                    //safer as will limit to 0
+                    x: x.saturating_sub(case_size * i),
                     y,
                 },
                 body_image,
@@ -78,7 +85,7 @@ impl<'a> SnakeBody<'a> {
         self.body[0].set_position(self.position_ini.clone());
         for i in 1..self.size_ini {
             self.body[i as usize].set_position(Position {
-                x: self.position_ini.x + (self.case_size * i),
+                x: self.position_ini.x.saturating_sub(self.case_size * i),
                 y: self.position_ini.y,
             });
         }
@@ -134,17 +141,17 @@ impl<'a> SnakeBody<'a> {
         self.ramping_body(current);
     }
 
-    /// Moves the snake's head up by one case and updates the body accordingly.
+    /// Moves the snake's head up by one case/line and updates the body accordingly.
     pub fn up(&mut self) {
         let current = &self.body[0].get_position().clone();
-        self.body[0].position.y -= self.case_size / 2;
+        self.body[0].position.y -= 1;
         self.ramping_body(current);
     }
 
-    /// Moves the snake's head down by one case and updates the body accordingly.
+    /// Moves the snake's head down by one case/line and updates the body accordingly.
     pub fn down(&mut self) {
         let current = &self.body[0].get_position().clone();
-        self.body[0].position.y += self.case_size / 2;
+        self.body[0].position.y += 1;
         self.ramping_body(current);
     }
 

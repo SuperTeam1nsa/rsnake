@@ -2,11 +2,11 @@ pub use crate::controls::direction::Direction;
 use crate::controls::input::playing_input_loop;
 pub use crate::controls::speed::Speed;
 pub use crate::game_logic::fruits_manager::FruitsManager;
-use crate::game_logic::playing_logic::playing_logic_loop;
+use crate::game_logic::playing_logic::{playing_logic_loop, want_to_play_greeting_screen};
 pub use crate::game_logic::state::{GameState, GameStatus};
-use crate::graphics::map::Map;
 use crate::graphics::playing_render::playing_render_loop;
-use crate::graphics::snake_body::SnakeBody;
+use crate::graphics::sprites::map::Map;
+use crate::graphics::sprites::snake_body::SnakeBody;
 use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -58,6 +58,27 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
             ))),
             terminal,
         }
+    }
+    pub fn menu(&mut self) {
+        while self
+            .state
+            .read()
+            .expect("Panic already, check previous error")
+            .status
+            != GameStatus::ByeBye
+        {
+            if !want_to_play_greeting_screen(&mut self.terminal) {
+                return;
+            }
+            self.init();
+            self.start();
+        }
+    }
+    fn init(&mut self) {
+        //init data for new game
+        self.state.write().unwrap().reset();
+        self.serpent.write().unwrap().reset();
+        *self.direction.write().unwrap() = Direction::Right;
     }
     /// Start the main Game threads: input, rendering, logic
     pub fn start(&mut self) {

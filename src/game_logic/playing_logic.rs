@@ -2,9 +2,9 @@ use crate::controls::direction::Direction;
 use crate::controls::input::{greeting_screen_manage_input, GreetingOption};
 use crate::game_logic::fruits_manager::FruitsManager;
 use crate::game_logic::state::{GameState, GameStatus};
-use crate::graphics::fruit::Fruit;
-use crate::graphics::map::Map;
-use crate::graphics::snake_body::SnakeBody;
+use crate::graphics::sprites::fruit::Fruit;
+use crate::graphics::sprites::map::Map;
+use crate::graphics::sprites::snake_body::SnakeBody;
 use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
 use std::thread::sleep;
@@ -63,11 +63,11 @@ pub fn playing_logic_loop(
                 sleep(Duration::from_millis(1000));
                 gs.write().unwrap().reset();
                 snake.write().unwrap().reset();
-                *direction.write().unwrap() = Direction::Left;
+                *direction.write().unwrap() = Direction::Right;
                 //graphical resize on rendering part (not really a game_logic constant)
             }
-            GameStatus::ByeBye => break,
-            _ => {}
+            GameStatus::ByeBye | GameStatus::Menu => break,
+            GameStatus::Paused | GameStatus::GameOver => {}
         }
         sleep(Duration::from_millis(game_speed));
     }
@@ -77,7 +77,7 @@ pub fn playing_logic_loop(
 pub fn want_to_play_greeting_screen(terminal: &mut DefaultTerminal) -> bool {
     let mut greeting_choice = None;
     while greeting_choice.is_none() {
-        crate::graphics::utils::greeting(terminal);
+        crate::graphics::menus::greeting(terminal);
         greeting_choice = greeting_screen_manage_input();
     }
     match greeting_choice.expect("Unreachable None code in greeting code reached !") {

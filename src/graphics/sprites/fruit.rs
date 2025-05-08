@@ -7,7 +7,7 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::graphics::fruit::Fruit;
+//! use rsnake::graphics::sprites::fruit::Fruit;
 //! use rsnake::graphics::graphic_block::Position;
 //!
 //! let position = Position { x: 5, y: 10 };

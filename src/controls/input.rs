@@ -5,6 +5,7 @@ use crossterm::event::{KeyCode, KeyEventKind};
 use std::sync::{Arc, RwLock};
 
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
+const MENU_KEYS: [KeyCode; 2] = [KeyCode::Char('m'), KeyCode::Char('M')];
 const DIRECTIONAL_KEYS: [KeyCode; 4] = [KeyCode::Down, KeyCode::Up, KeyCode::Left, KeyCode::Right];
 pub(crate) const PAUSE_KEYS: [KeyCode; 3] =
     [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
@@ -31,6 +32,10 @@ pub fn playing_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<Ga
                 //QUIT
                 } else if QUIT_KEYS.contains(&key.code) {
                     gs.write().unwrap().status = GameStatus::ByeBye;
+                    break;
+                //MENU
+                } else if MENU_KEYS.contains(&key.code) {
+                    gs.write().unwrap().status = GameStatus::Menu;
                     break;
                 //RESTART
                 } else if RESET_KEYS.contains(&key.code) {

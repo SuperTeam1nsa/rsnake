@@ -1,14 +1,14 @@
-//! This module contains the core components of the game logic, it includes the following submodules:
+//! This module contains the core components of the game logic, it includes the following sub-modules:
 //!
-//! - [`graphic_block`]: Handles the graphical rendering of game logic blocks in the terminal.
-//! - [`sprites`]: Provides the game sprites, as snake, map and so on. .
-//! - [`menus`]: Provides utility functions to assist with common texts and graphical tasks
+//! - [`fruit`]: Represents the fruit element, including its position, score, and image.
+//! - [`map`]: Manages the game logic map, layout, and boundaries.
+//! - [`snake_body`]: Tracks and manages the snake's body and its movement.
+pub mod fruit;
 
-pub mod graphic_block;
-pub mod sprites;
+pub mod map;
 
-pub mod menus;
-pub mod playing_render;
+pub mod snake_body;
+
 /* Just to have some fun with moving letter
 pub fn left(&mut self) {
         let mut current: u16 = self.body[0].x;
