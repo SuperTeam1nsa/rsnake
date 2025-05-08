@@ -74,7 +74,7 @@ pub fn playing_logic_loop(
 }
 /// # Panics                                                                                              
 /// if Terminal writing is not possible
-pub fn wanna_play_greeting_screen(terminal: &mut DefaultTerminal) -> bool {
+pub fn want_to_play_greeting_screen(terminal: &mut DefaultTerminal) -> bool {
     let mut greeting_choice = None;
     while greeting_choice.is_none() {
         crate::graphics::utils::greeting(terminal);
