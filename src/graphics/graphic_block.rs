@@ -20,6 +20,7 @@ use ratatui::widgets::{Widget, WidgetRef};
 pub struct GraphicBlock<'a> {
     pub(crate) position: Position,
     image: Span<'a>,
+    pub enabled: bool,
 }
 
 /// A struct representing the position of a graphical block in the 2D space.
@@ -55,6 +56,7 @@ impl<'a> GraphicBlock<'a> {
         GraphicBlock {
             position,
             image: Span::styled(image, style),
+            enabled: true,
         }
     }
 
@@ -66,6 +68,12 @@ impl<'a> GraphicBlock<'a> {
         self.position = position;
     }
 
+    pub fn enable(&mut self) {
+        self.enabled = true;
+    }
+    pub fn disable(&mut self) {
+        self.enabled = false;
+    }
     /// Retrieves the current position of the graphic block.
     ///
     /// # Returns
@@ -88,7 +96,10 @@ impl WidgetRef for GraphicBlock<'_> {
     /// If the block is outside the visible area, it will not be drawn, avoiding any panics.
     /// The game logic will not crash even if part of the block is outside the visible area due to window resizing.
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        if area.y + self.position.y < area.height && area.x + self.position.x < area.width {
+        if self.enabled
+            && area.y + self.position.y < area.height
+            && area.x + self.position.x < area.width
+        {
             buf.set_span(
                 area.x + self.position.x,
                 area.y + self.position.y,

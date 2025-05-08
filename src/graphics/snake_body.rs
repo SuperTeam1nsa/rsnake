@@ -86,16 +86,21 @@ impl<'a> SnakeBody<'a> {
 
     /// Updates the positions of the body segments to simulate the movement of the snake.
     /// The body segments "follow" the previous segment.
+    /// Add one previous not shown elements by enabling it (to avoid a big increase in tail as +10)
     ///
     /// # Parameters
     /// - `previous_head`: The position of the previous head of the snake.
     pub fn ramping_body(&mut self, previous_head: &Position) {
         let mut current = previous_head.clone();
         let mut previous = current;
+        let has_grown_by_one = false;
         for i in 1..self.body.len() {
             current = self.body[i].get_position().clone();
             self.body[i].set_position(previous);
             previous = current;
+            if !self.body[i].enabled && !has_grown_by_one {
+                self.body[i].enable();
+            }
         }
     }
 
@@ -187,7 +192,8 @@ impl<'a> SnakeBody<'a> {
                     .last()
                     .expect("Snake body has no elements ! Something went wrong")
                     .clone();
-                block_to_add.position.x += self.case_size;
+                //To show later, snake body one by one
+                block_to_add.disable();
                 self.body.push(block_to_add);
             }
         } else {

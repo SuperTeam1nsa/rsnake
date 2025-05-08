@@ -42,7 +42,7 @@ pub mod graphics;
 use clap::Parser;
 use controls::speed::Speed;
 
-use crate::game_logic::playing_logic::wanna_play_greeting_screen;
+use crate::game_logic::playing_logic::want_to_play_greeting_screen;
 use crate::game_logic::playing_thread_manager::Game;
 use crate::graphics::graphic_block::Position;
 use crate::graphics::snake_body::SnakeBody;
@@ -57,7 +57,7 @@ pub fn start_snake() {
     // If everything is OK, inits terminal for rendering
     let mut terminal = ratatui::init();
     // Display greeting screen
-    if !wanna_play_greeting_screen(&mut terminal) {
+    if !want_to_play_greeting_screen(&mut terminal) {
         return;
     }
     //except if gamer want to quit from menu screen, we continue
