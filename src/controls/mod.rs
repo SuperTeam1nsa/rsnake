@@ -1,16 +1,16 @@
 //! # Game Modules
 //!
-//! This module organizes various components of the game, including:
+//! This module organizes various components of the game logic, including:
 //!
 //! - `direction`: manages movement directions.
-//! - `fruits_manager`: handles fruit-related logic and management.
-//! - `game_state`: maintains the game's state, including score and status.
-//! - `speed`: defines game speed.
+//! - `input`: get keyboard input.
+//! - `speed`: defines game logic speed.
+//! - `cli`: manage the command line options
 //!
-//! These modules collectively contribute to the core mechanics of the game.
+//! These modules collectively contribute to the control part of the game logic.
 //!
 
+pub mod cli;
 pub mod direction;
-pub mod fruits_manager;
-pub mod game_state;
+pub mod input;
 pub mod speed;

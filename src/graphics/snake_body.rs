@@ -13,7 +13,7 @@ use ratatui::widgets::WidgetRef;
 ///
 /// # Fields
 /// - `body`: A vector of `GraphicBlock` elements representing the segments of the snake's body.
-/// - `case_size`: The size of each segment of the snake's body in pixels.
+/// - `CASE_SIZE`: The size of each segment of the snake's body in pixels.
 /// - `position_ini`: The initial position of the snake's head.
 /// - `size_ini`: The initial size of the snake (the number of body segments).
 #[derive(Clone)]
@@ -33,7 +33,7 @@ impl<'a> SnakeBody<'a> {
     /// - `head_image`: The image for the snake's head.
     /// - `nb`: The number of body segments.
     /// - `position`: The initial position of the snake's head.
-    /// - `case_size`: The size of each body segment in pixels.
+    /// - `CASE_SIZE`: The size of each body segment in pixels.
     ///
     /// # Returns
     /// A new `SnakeBody` instance with the specified parameters.
@@ -102,16 +102,17 @@ impl<'a> SnakeBody<'a> {
     /// Checks if the snake's head overlaps with any part of its body.
     ///
     /// # Returns
-    /// - `Ok(&Position)` if the head does not overlap with the body.
-    /// - `Err(())` if the head overlaps with any part of the body.
-    pub fn head_position_and_overlap(&self) -> Result<&Position, ()> {
+    /// - `false` if the head does not overlap with the body.
+    /// - `true` if the head overlaps with any part of the body.
+    #[must_use]
+    pub fn is_snake_eating_itself(&self) -> bool {
         let head = self.body[0].get_position();
         for b in self.body.iter().skip(1) {
             if head == b.get_position() {
-                return Err(());
+                return true;
             }
         }
-        Ok(head)
+        false
     }
 
     /// Moves the snake's head left by one case and updates the body accordingly.
@@ -150,10 +151,9 @@ impl<'a> SnakeBody<'a> {
     /// - `carte`: The map used to check if the snake's head is out of bounds.
     ///
     /// # Returns
-    /// - `Ok(&Position)` if the snake's head does not overlap with its body and is within the map.
-    /// - `Err(())` if the snake's head overlaps with its body.
+    /// - `&Position` the new snake's head position.
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn ramp(&mut self, direction: &Direction, carte: &Map) -> Result<&Position, ()> {
+    pub fn ramp(&mut self, direction: &Direction, carte: &Map) -> &Position {
         match direction {
             Direction::Up => self.up(),
             Direction::Down => self.down(),
@@ -163,10 +163,8 @@ impl<'a> SnakeBody<'a> {
         if carte.out_of_map(self.body[0].get_position()) {
             let new_position = carte.out_of_map_reverse_position(self.body[0].get_position());
             self.body[0].set_position(new_position);
-            Ok(self.body[0].get_position())
-        } else {
-            self.head_position_and_overlap()
         }
+        self.body[0].get_position()
     }
 
     /// A backup plan in case the widget reference is unstable, by cloning the snake body.

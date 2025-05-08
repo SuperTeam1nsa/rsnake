@@ -1,18 +1,19 @@
 //! # Game State Management
 //!
-//! This module defines a `GameState` struct that manages game-related flags such as life, score, and game status.
+//! This module defines a `GameState` struct that manages game-related flags
+//! such as life, score, and game status.
 //! It provides methods for initializing and resetting the game state.
 //!
 //! # Example
 //! ```rust
-//! use rsnake::game::{GameState, GameStatus};
+//! use rsnake::game_logic::state::{GameState, GameStatus};
 //!
-//! let mut state = GameState::new(3); // Initialize game with 3 lives
+//! let mut state = GameState::new(3); // Initialize game_logic with 3 lives
 //! assert_eq!(state.life, 3);
 //! assert_eq!(state.score, 0);
 //! assert_eq!(state.status, GameStatus::Playing);
 //!
-//! state.reset(); // Reset game state
+//! state.reset(); // Reset game_logic state
 //! assert_eq!(state.life, 3);
 //! assert_eq!(state.score, 0);
 //! ```

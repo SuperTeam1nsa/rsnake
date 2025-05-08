@@ -42,7 +42,7 @@ fn test_cli_runs_with_default_args() {
         .arg("•")
         .arg("--nb-of-fruit")
         .arg("4")
-        .timeout(std::time::Duration::from_secs(5))
+        .timeout(std::time::Duration::from_secs(10))
         .assert()
         .stdout(contains("Have a good game !"))
         .stderr(contains("")); // timeout à 5s
@@ -50,7 +50,7 @@ fn test_cli_runs_with_default_args() {
     let elapsed = now.elapsed();
 
     assert!(
-        elapsed.as_secs() >= 5,
+        elapsed.as_secs() >= 10,
         "Command goes wrong, it takes : {:?}s",
         elapsed
     );

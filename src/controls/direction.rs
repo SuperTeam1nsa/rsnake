@@ -1,10 +1,10 @@
 //! # Direction Enum
 //!
-//! Represents movement directions in our game.
+//! Represents movement directions in the game.
 //!
 //! # Example
 //! ```rust
-//! use rsnake::game::Direction;
+//! use rsnake::controls::direction::Direction;
 //!
 //! let dir = Direction::Up;
 //! match dir {
