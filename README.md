@@ -15,9 +15,9 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 ## TODO
 
 - [ ] Add a save score (local db) with a pseudo got from cmdline
-- [ ] Add some performance log with tracing for example
-- [ ] Snake grow, body element one by one increase as natural snake move, adding a display flag and init to negative
-  position
+- [ ] Add some performance log with tracing, for example
+- [ ] Show game options in the menu, and visually change them (tab, direction, using statefulWidget), start entering s
+- [ ] Enhance fruits eaten detection and grid management with multiple emojis as body
 
 ## Installation Quick path
 

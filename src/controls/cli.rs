@@ -29,8 +29,9 @@ pub struct Cli {
         long,
         default_value = "🎄",
         help = "Symbol used to represent the snake's head. Cool symbol as 😁🤠🤡🥳🥸👺👹👽\
-        👾🐼🐉🐍🦀     .
-        Do not use emoji displaying on multiple chars as it will badly be rendered"
+        👾🐼🐉🐍🦀🐳     .
+        Do not use one emoji displaying on multiple chars as it will badly be rendered, but multiple characters and classic are allowed as:
+        -z ZZ -b aa"
     )]
     pub head_symbol: String,
 
@@ -40,8 +41,9 @@ pub struct Cli {
         long,
         default_value = "❄️",
         help = "Symbol used to represent the snake's body/trail. Cool symbol as 🍁😋🥑🐾🐢🦎🪽🐥\
-        🐣🕸️🦠🦴👣🍥🥮🍪🍩🧊     . 
-        Do not use emoji displaying on multiple chars as it will badly be rendered."
+        🐣♡🦠🦴👣🍥🥮🍪🍩🧊🏴🧨🦑🐟     . 
+        Do not use one emoji displaying on multiple chars as it will badly be rendered, but multiple characters are allowed as: -z 🐳 -b 👽-🦴.
+        Be careful, because of unicode width, not all combinaison are playable depending of your font/terminal"
     )]
     pub body_symbol: String,
 

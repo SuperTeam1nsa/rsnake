@@ -7,7 +7,7 @@
 //! # Example
 //! ```rust
 //! use rsnake::game_logic::fruits_manager::FruitsManager;
-//! use rsnake::graphics::map::Map;
+//! use rsnake::graphics::sprites::map::Map;
 //! use std::sync::{Arc, RwLock};
 //! use ratatui::layout::Rect;
 //! use rsnake::graphics::graphic_block::Position;
@@ -26,9 +26,9 @@
 //! ```
 //!
 
-use crate::graphics::fruit::{Fruit, FRUITS_SCORES_PROBABILITIES};
 use crate::graphics::graphic_block::Position;
-use crate::graphics::map::Map;
+use crate::graphics::sprites::fruit::{Fruit, FRUITS_SCORES_PROBABILITIES};
+use crate::graphics::sprites::map::Map;
 use rand::{rng, Rng};
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -52,7 +52,7 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     /// use std::sync::{Arc, RwLock};
     /// use ratatui::layout::Rect;
     /// use rsnake::game_logic::fruits_manager::FruitsManager;
-    /// use rsnake::graphics::map::Map;
+    /// use rsnake::graphics::sprites::map::Map;
     /// let x =42;
     /// let map = Arc::new(RwLock::new(Map::new(2, Rect::new(0,0, 160,10))));
     /// let manager = FruitsManager::new(3, map);
@@ -117,7 +117,7 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     fn generate_position_rounded_by_cs(carte: &Map) -> Position {
         let mut rng = rng();
         let cs = carte.get_case_size();
-        let csy = cs / 2;
+        let csy = 1;
         let width = carte.area().width;
         let height = carte.area().height;
         let max_index_x = (width / cs).saturating_sub(cs);

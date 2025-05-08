@@ -1,11 +1,11 @@
 use crate::game_logic::fruits_manager::FruitsManager;
 use crate::game_logic::state::{GameState, GameStatus};
-use crate::graphics::map::Map;
-use crate::graphics::snake_body::SnakeBody;
-use crate::graphics::utils;
+use crate::graphics::menus;
+use crate::graphics::sprites::map::Map;
+use crate::graphics::sprites::snake_body::SnakeBody;
 use ratatui::layout::Rect;
 use ratatui::widgets::Paragraph;
-use ratatui::DefaultTerminal;
+use ratatui::{DefaultTerminal, Frame};
 use std::sync::{Arc, RwLock};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
@@ -49,7 +49,6 @@ pub fn playing_render_loop<'a: 'b, 'b>(
             frame_count = 1.0;
             start_windows_time = Instant::now();
         }
-
         // start rendering game sprites
         terminal
             .draw(|frame| {
@@ -112,27 +111,13 @@ pub fn playing_render_loop<'a: 'b, 'b>(
                     let fruits_manager_read = fruits_manager.read().unwrap(); // Read lock
                     frame.render_widget(&*fruits_manager_read, frame.area());
                 }
+
                 // And game_logic status
-                match state.read().unwrap().status {
-                    GameStatus::Paused => {
-                        frame.render_widget(utils::pause_paragraph(), frame.area());
-                    }
-                    GameStatus::GameOver => {
-                        frame.render_widget(utils::game_over_paragraph(), frame.area());
-                    }
-                    GameStatus::ByeBye => {
-                        frame.render_widget(utils::byebye_paragraph(), frame.area());
-                        rendering_break = true;
-                    }
-                    GameStatus::Playing => (),
-                    GameStatus::Restarting => {
-                        frame.render_widget(utils::restart_paragraph(), frame.area());
-                    }
-                }
+                rendering_break = game_state_render(&state.read().unwrap().status, frame);
             })
             .expect("bad rendering, check sprites position");
         if rendering_break {
-            //let time for user to see the farewell screen
+            //let time for user to see the farewell/menu screen
             sleep(Duration::from_millis(1000));
             //nice labeled loop :)
             break 'render_loop;
@@ -142,4 +127,29 @@ pub fn playing_render_loop<'a: 'b, 'b>(
             sleep(Duration::from_millis(16).saturating_sub(start_frame_time.elapsed()));
         }
     }
+}
+/// Return whether stop the rendering
+fn game_state_render(state: &GameStatus, frame: &mut Frame) -> bool {
+    let mut rendering_break = false;
+    match state {
+        GameStatus::Paused => {
+            menus::pause_paragraph(frame);
+        }
+        GameStatus::GameOver => {
+            menus::game_over_paragraph(frame);
+        }
+        GameStatus::ByeBye => {
+            menus::byebye_paragraph(frame);
+            rendering_break = true;
+        }
+        GameStatus::Playing => (),
+        GameStatus::Restarting => {
+            menus::restart_paragraph(frame);
+        }
+        GameStatus::Menu => {
+            menus::menu_paragraph(frame);
+            rendering_break = true;
+        }
+    }
+    rendering_break
 }

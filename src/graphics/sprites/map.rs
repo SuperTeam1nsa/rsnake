@@ -56,18 +56,18 @@ impl Map<'_> {
     /// ```rust
     /// use ratatui::layout::Rect;
     /// use rsnake::graphics::graphic_block::Position;
-    /// use rsnake::graphics::map::Map;
+    /// use rsnake::graphics::sprites::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// assert!(map.out_of_map(&position));
     /// ```
     #[must_use]
     pub fn out_of_map(&self, Position { x, y }: &Position) -> bool {
-        //*2 to put out the bordered map (last case being ==== )
-        let x_max = self.viewport.width - (self.case_size * 2);
-        let y_max = self.viewport.height - self.case_size;
+        //+/- 2 to put out the bordered map (last case being ==== )
+        let x_max = self.viewport.width - (self.case_size + 2);
+        let y_max = self.viewport.height - 2;
         let x_min = self.case_size;
-        let y_min = self.case_size / 2;
+        let y_min = 1;
         *x < x_min || *x > x_max || *y < y_min || *y > y_max
     }
 
@@ -84,7 +84,7 @@ impl Map<'_> {
     /// ```rust
     /// use ratatui::layout::Rect;
     /// use rsnake::graphics::graphic_block::Position;
-    /// use rsnake::graphics::map::Map;
+    /// use rsnake::graphics::sprites::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// let new_position = map.out_of_map_reverse_position(&position);
@@ -93,10 +93,10 @@ impl Map<'_> {
     #[must_use]
     pub fn out_of_map_reverse_position(&self, Position { x, y }: &Position) -> Position {
         //*2 to put out the bordered map (last case being ==== )
-        let x_max = self.viewport.width - (self.case_size * 2);
-        let y_max = self.viewport.height - self.case_size;
+        let x_max = self.viewport.width - (self.case_size + 2);
+        let y_max = self.viewport.height - 2;
         let x_min = self.case_size;
-        let y_min = self.case_size / 2;
+        let y_min = 1;
         if *y > y_max {
             Position { x: *x, y: y_min }
         } else if *y < y_min {
