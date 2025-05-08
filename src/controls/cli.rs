@@ -5,13 +5,13 @@ use clap::Parser;
 #[command(
     version,
     about = "Snake Game with CLI arguments. Quick custom run: cargo run -- -z 👾 -b 🪽 -l 10 ",
-    long_about = "A simple Snake game where you can configure the velocity, \
+    long_about = "A simple Snake game_logic where you can configure the velocity, \
     snake appearance, and more using command-line arguments.
     Example for asian vibes: rsnake -z 🐼 -b 🍥"
 )]
 pub struct Cli {
     /// Velocity of the snake (Slow, Normal, Fast, Tremendous)
-    /// Uses derive `ValueEnum` on the enum Velocity, and enforce the type
+    /// Derive `ValueEnum` on the enum Velocity, and enforce the type
     /// `clap::ValueEnum`, which automatically handles possible values and displays them in the help message.
     /// Now, clap enforces valid inputs without requiring a manual `FromStr` implementation.
     #[arg(
@@ -68,7 +68,7 @@ pub struct Cli {
         short,
         long,
         default_value_t = 5,
-        help = "Defines the number of fruits available in the game at once."
+        help = "Defines the number of fruits available in the game_logic at once."
     )]
     pub nb_of_fruit: u16,
 
@@ -84,7 +84,7 @@ pub struct Cli {
     #[arg(
         long,
         default_value_t = false,
-        help = "Classic game with only growing snake, so fruits with negative size effect will have no size effect"
+        help = "Classic game_logic with only growing snake, so fruits with negative size effect will have no size effect"
     )]
     pub classic: bool,
 }

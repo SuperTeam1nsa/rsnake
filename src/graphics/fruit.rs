@@ -1,6 +1,6 @@
 //! # Fruit Management Module
 //!
-//! This module defines the `Fruit` struct, which represents different fruits in the game and provides the
+//! This module defines the `Fruit` struct, which represents different fruits in the game logic and provides the
 //!  ability to create, position, and render them.
 //!
 //! The `FRUITS_SCORES_PROBABILITIES` constant defines various fruits with their respective scores and spawn probabilities.

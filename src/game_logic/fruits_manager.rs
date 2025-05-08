@@ -1,11 +1,12 @@
 //! # Fruits Manager
 //!
-//! This module defines the `FruitsManager` struct, which is responsible for handling fruit objects within a game.
+//! This module defines the `fruits_manager` struct,
+//! which is responsible for handling fruit objects within a game.
 //! It includes methods for spawning, replacing, and interacting with fruits.
 //!
 //! # Example
 //! ```rust
-//! use rsnake::game::FruitsManager;
+//! use rsnake::game_logic::fruits_manager::FruitsManager;
 //! use rsnake::graphics::map::Map;
 //! use std::sync::{Arc, RwLock};
 //! use ratatui::layout::Rect;
@@ -35,10 +36,11 @@ use ratatui::prelude::Widget;
 use ratatui::widgets::WidgetRef;
 use std::sync::{Arc, RwLock};
 
-/// Manages fruit objects within the game.
+/// Manages fruit objects within the game logic.
+/// Map outlive fruits, so 'b lifetime >= 'a (fruits) lifetime
 pub struct FruitsManager<'a, 'b: 'a> {
-    fruits: Vec<Fruit<'a>>,      // List of fruits currently in the game
-    carte: Arc<RwLock<Map<'b>>>, // Reference to the game map
+    fruits: Vec<Fruit<'a>>,      // List of fruits currently in the game_logic
+    carte: Arc<RwLock<Map<'b>>>, // Reference to the game_logic map
 }
 
 impl<'a, 'b> FruitsManager<'a, 'b> {
@@ -49,7 +51,7 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     /// ```
     /// use std::sync::{Arc, RwLock};
     /// use ratatui::layout::Rect;
-    /// use rsnake::game::FruitsManager;
+    /// use rsnake::game_logic::fruits_manager::FruitsManager;
     /// use rsnake::graphics::map::Map;
     /// let x =42;
     /// let map = Arc::new(RwLock::new(Map::new(2, Rect::new(0,0, 160,10))));

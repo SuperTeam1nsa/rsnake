@@ -1,8 +1,8 @@
-/// This module contains definitions and implementations for graphical blocks used in the game.
+/// This module contains definitions and implementations for graphical blocks used in the game logic.
 ///
 /// It includes the following components:
 ///
-/// - [`GraphicBlock`]: A struct representing a graphical block that can be placed in the game world.
+/// - [`GraphicBlock`]: A struct representing a graphical block that can be placed in the game logic world.
 /// - [`Position`]: A struct representing the position of a graphical block in a 2D space.
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
@@ -10,7 +10,7 @@ use ratatui::prelude::{Span, Style};
 use ratatui::widgets::{Widget, WidgetRef};
 
 
-/// A struct representing a graphical block that can be displayed in the game.
+/// A struct representing a graphical block that can be displayed in the game logic.
 /// It holds the position and visual representation (image) of the block.
 ///
 /// # Fields
@@ -86,7 +86,7 @@ impl WidgetRef for GraphicBlock<'_> {
     ///
     /// # Behavior
     /// If the block is outside the visible area, it will not be drawn, avoiding any panics.
-    /// The game will not crash even if part of the block is outside the visible area due to window resizing.
+    /// The game logic will not crash even if part of the block is outside the visible area due to window resizing.
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
         if area.y + self.position.y < area.height && area.x + self.position.x < area.width {
             buf.set_span(

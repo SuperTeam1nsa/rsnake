@@ -1,5 +1,5 @@
 use crate::controls::speed;
-use crate::game::Speed;
+use crate::controls::speed::Speed;
 use crate::graphics::fruit::FRUITS_SCORES_PROBABILITIES;
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::text::{Line, Text};
@@ -8,7 +8,9 @@ use ratatui::DefaultTerminal;
 use std::thread::sleep;
 use std::time::Duration;
 
-// /Use AI or a generator as : http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Pause
+// For ASCII art use AI or a generator as:
+// http://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=Pause
+// For text display: https://ratatui.rs/recipes/render/display-text/
 const GAME_OVER_TEXT: &str = "\n\
              ██████╗  █████╗ ███╗   ███╗███████╗       ██████╗ ██╗   ██╗███████╗██████╗ \n\
             ██╔═══   ██╔══██╗████╗ ████║██╔════╝      ██╔═══██╗██║   ██║██╔════╝██╔══██╗\n\
@@ -40,20 +42,7 @@ const RESTART_TEXT: &str = "\n\
 ██╔══██╗██╔══╝  ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   
 ██║  ██║███████╗███████║   ██║   ██║  ██║██║  ██║   ██║   
 ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ";
-/*pub fn center_h(area: Rect, nb_of_max_char: u16) -> Rect {
-    //, horizontal: Constraint
-    let [area] = Layout::horizontal([Constraint::Length(nb_of_max_char)])
-        .flex(Flex::Center)
-        .areas(area);
-    //let [area] = Layout::vertical([vertical]).flex(Flex::Center).areas(area);
-    area
-}
-pub fn top_margin(area: Rect, marge: u16) -> Rect {
-    let [area] = Layout::vertical([Constraint::Length(1)])
-        .margin(marge)
-        .areas(area);
-    area
-}*/
+
 /// Print the welcome screen, reminding controls
 /// # Panics
 /// Will panic if no suitable terminal for displaying ios provided

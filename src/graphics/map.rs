@@ -2,13 +2,13 @@ use crate::graphics::graphic_block::Position;
 use ratatui::layout::Rect;
 use ratatui::widgets::{Block, BorderType};
 
-/// A struct representing the game map.
+/// A struct representing the game logic map.
 /// The map is resizable and represents the writeable area of the terminal, with a defined case size
-/// for each cell and a viewport for rendering the game world.
+/// for each cell and a viewport for rendering the game logic world.
 ///
 /// # Fields
 /// - `block`: A `Block` widget representing the map's visual border and title.
-/// - `case_size`: The size of each cell (case) in pixels on the terminal screen.
+/// - `CASE_SIZE`: The size of each cell (case) in pixels on the terminal screen.
 /// - `viewport`: The dimensions of the terminal viewport for rendering the map.
 #[derive(Clone)]
 pub struct Map<'a> {
@@ -39,7 +39,7 @@ impl Map<'_> {
             viewport,
         }
     }
-    /// To resize the map viewport, not for in game use # unfair, but when after restarting it is OK
+    /// To resize the map viewport, not for in game logic use # unfair, but when after restarting it is OK
     pub fn resize_to_terminal(&mut self, viewport: Rect) {
         self.viewport = viewport;
     }
