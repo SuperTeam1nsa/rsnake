@@ -18,7 +18,7 @@ const LIFE_RECT: Rect = Rect::new(40, 0, 60, 1);
 const NB_OF_FRAMES_WINDOW: f64 = 1_000.0;
 const TOO_MUCH_LIVES_TO_DISPLAY: &str = " life: ❤️❤️❤️❤️❤️... ";
 /// # Panics                                                                                              
-/// if Arc panic while holding the resources (poisoning), no recovery mechanism implemented better crash  
+/// if Arc panics while holding the resources (poisoning), no recovery mechanism implemented better crash  
 pub fn playing_render_loop<'a: 'b, 'b>(
     carte: &Arc<RwLock<Map>>,
     fruits_manager: &Arc<RwLock<FruitsManager<'a, 'b>>>,
@@ -28,7 +28,7 @@ pub fn playing_render_loop<'a: 'b, 'b>(
     speed_symbol: &str,
     terminal: &mut DefaultTerminal,
 ) {
-    //better to pre-format string than doing it each time
+    //better to pre-format a string than doing it each time
     let speed_text = format!("Speed: {speed_symbol}");
 
     //configure display variable with default value
@@ -63,7 +63,7 @@ pub fn playing_render_loop<'a: 'b, 'b>(
                         need_carte_resize = true;
                     }
                 }
-                //remember: cannot unlock in the same scope twice (even less write/read)
+                //remember: cannot unlock in the same scope twice (even less write/read),
                 // so use boolean to limit the number of unlocking
                 if need_carte_resize {
                     carte.write().unwrap().resize_to_terminal(area);
@@ -117,7 +117,7 @@ pub fn playing_render_loop<'a: 'b, 'b>(
             })
             .expect("bad rendering, check sprites position");
         if rendering_break {
-            //let time for user to see the farewell/menu screen
+            //let time for the user to see the farewell/menu screen
             sleep(Duration::from_millis(1000));
             //nice labeled loop :)
             break 'render_loop;
@@ -133,21 +133,21 @@ fn game_state_render(state: &GameStatus, frame: &mut Frame) -> bool {
     let mut rendering_break = false;
     match state {
         GameStatus::Paused => {
-            menus::pause_paragraph(frame);
+            menus::status::pause_paragraph(frame);
         }
         GameStatus::GameOver => {
-            menus::game_over_paragraph(frame);
+            menus::status::game_over_paragraph(frame);
         }
         GameStatus::ByeBye => {
-            menus::byebye_paragraph(frame);
+            menus::status::byebye_paragraph(frame);
             rendering_break = true;
         }
         GameStatus::Playing => (),
         GameStatus::Restarting => {
-            menus::restart_paragraph(frame);
+            menus::status::restart_paragraph(frame);
         }
         GameStatus::Menu => {
-            menus::menu_paragraph(frame);
+            menus::status::menu_paragraph(frame);
             rendering_break = true;
         }
     }

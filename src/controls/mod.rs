@@ -10,7 +10,6 @@
 //! These modules collectively contribute to the control part of the game logic.
 //!
 
-pub mod cli;
 pub mod direction;
 pub mod input;
 pub mod speed;

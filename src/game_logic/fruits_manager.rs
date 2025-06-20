@@ -120,8 +120,15 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
         let csy = 1;
         let width = carte.area().width;
         let height = carte.area().height;
-        let max_index_x = (width / cs).saturating_sub(cs);
-        let max_index_y = (height / csy).saturating_sub(csy);
+        let mut max_index_x = (width / cs).saturating_sub(cs);
+        let mut max_index_y = (height / csy).saturating_sub(csy);
+        // Ensure a valid range for generation
+        if max_index_x <= 1 {
+            max_index_x = 2;
+        }
+        if max_index_y <= 1 {
+            max_index_y = 2;
+        }
         Position {
             x: rng.random_range(1..max_index_x) * cs,
             y: rng.random_range(1..max_index_y) * csy,

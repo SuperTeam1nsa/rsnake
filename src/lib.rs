@@ -40,21 +40,18 @@ pub mod game_logic;
 pub mod graphics;
 
 use crate::game_logic::playing_thread_manager::Game;
-use crate::graphics::graphic_block::Position;
 use crate::graphics::sprites::snake_body::SnakeBody;
 use clap::Parser;
-use controls::cli::Cli;
-use controls::speed::Speed;
+use game_logic::game_options::GameOptions;
 use graphics::sprites::map::Map as Carte;
 use ratatui::text::Span;
 use std::cmp::max;
 
-const INI_POSITION: Position = Position { x: 50, y: 5 };
 /// # Panics
 /// If bad characters (invalid size) are provided for snake body or head
 pub fn start_snake() {
     // get command line options and parsed them to check for errors
-    let args = Cli::parse();
+    let args = GameOptions::parse();
     // If everything is OK, inits terminal for rendering
     let mut terminal = ratatui::init();
     //ratatui using UnicodeWidthStr crates as dep
@@ -64,29 +61,22 @@ pub fn start_snake() {
         Span::raw(&args.head_symbol).width(),
     ))
     .expect("Bad symbol size, use a real character");
-    //except if gamer want to quit from menu screen, we continue
+    //except if gamer want to quit from the menu screen, we continue
     // set up parameters from option parsing
-    let velocity = args.velocity;
-    let uncaps_fps = args.uncaps_fps;
-    let classic = args.classic;
     let map: Carte = Carte::new(case_size, terminal.get_frame().area());
-    let speed: Speed = Speed::new(&velocity);
 
+    let body_symbol = args.body_symbol.clone();
+    let head_symbol = args.head_symbol.clone();
     let serpent: SnakeBody = SnakeBody::new(
-        &args.body_symbol,
-        &args.head_symbol,
+        &body_symbol,
+        &head_symbol,
         args.snake_length,
-        INI_POSITION,
+        GameOptions::initial_position(),
         case_size,
     );
+    // init our own Game engine
+    let mut jeu = Game::new(args, serpent, map, terminal);
     // Display greeting screen
-    let mut jeu = Game::new(
-        (classic, uncaps_fps, args.life, args.nb_of_fruit),
-        speed,
-        serpent,
-        map,
-        terminal,
-    );
     jeu.menu();
 
     //in all cases, restore

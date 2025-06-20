@@ -1,7 +1,9 @@
 use crate::controls::direction::Direction;
+use crate::controls::input::GreetingOption::StartGame;
 use crate::controls::input::{greeting_screen_manage_input, GreetingOption};
 use crate::game_logic::fruits_manager::FruitsManager;
 use crate::game_logic::state::{GameState, GameStatus};
+use crate::graphics::menus::greeting_menu::main_greeting_menu;
 use crate::graphics::sprites::fruit::Fruit;
 use crate::graphics::sprites::map::Map;
 use crate::graphics::sprites::snake_body::SnakeBody;
@@ -9,6 +11,7 @@ use ratatui::DefaultTerminal;
 use std::sync::{Arc, RwLock};
 use std::thread::sleep;
 use std::time::Duration;
+
 /// # Panics
 /// if Arc panic while holding the resources (poisoning), no recovery mechanism implemented better crash  
 pub fn playing_logic_loop(
@@ -72,16 +75,51 @@ pub fn playing_logic_loop(
         sleep(Duration::from_millis(game_speed));
     }
 }
+/// Control part of the main menu
+/// allows to switch to sub menu (Fruits, Speed, Parameters etc.)
+///
+/// # Return true if the player want to play, false otherwise
+///
 /// # Panics                                                                                              
 /// if Terminal writing is not possible
-pub fn want_to_play_greeting_screen(terminal: &mut DefaultTerminal) -> bool {
-    let mut greeting_choice = None;
-    while greeting_choice.is_none() {
-        crate::graphics::menus::greeting(terminal);
-        greeting_choice = greeting_screen_manage_input();
+pub fn controls_greeting_screen(terminal: &mut DefaultTerminal) -> bool {
+    let mut stay = true;
+    let mut action: Option<GreetingOption> = None;
+    main_greeting_menu(terminal, &None, &StartGame);
+    // To manage keys to switch selected item
+    //begin with start
+    let mut selected = 3;
+    let selection: [GreetingOption; 6] = [
+        GreetingOption::MainMenu,
+        GreetingOption::Fruits,
+        GreetingOption::Velocity,
+        GreetingOption::StartGame,
+        GreetingOption::Parameters,
+        GreetingOption::Help,
+    ];
+    while stay {
+        let current = greeting_screen_manage_input();
+        //to keep refreshing old menu otherwise and not come backing
+        if current.is_some() {
+            // if it is a key, manage the selected menu button change
+            if current == Some(GreetingOption::Next) {
+                selected = (selected + 1) % selection.len();
+            } else if current == Some(GreetingOption::Previous) {
+                //smart trick to loop over
+                selected = (selected + selection.len() - 1) % selection.len();
+            }
+            // if enter set the selected option
+            else if current == Some(GreetingOption::Enter) {
+                action = Some(selection[selected].clone());
+            } else {
+                action = current;
+            }
+        }
+        //display the menu
+        main_greeting_menu(terminal, &action, &selection[selected]);
+        if let Some(GreetingOption::StartGame | GreetingOption::QuitGame) = action {
+            stay = false;
+        }
     }
-    match greeting_choice.expect("Unreachable None code in greeting code reached !") {
-        GreetingOption::StartGame => true,
-        GreetingOption::QuitGame => false,
-    }
+    action == Some(GreetingOption::StartGame)
 }

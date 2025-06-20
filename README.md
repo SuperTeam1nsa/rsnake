@@ -15,44 +15,73 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 ## TODO
 
 - [ ] Add a save score (local db) with a pseudo got from cmdline
-- [ ] Add some performance log with tracing, for example
-- [ ] Show game options in the menu, and visually change them (tab, direction, using statefulWidget), start entering s
+- [ ] Add some performance log with tracing, for example,
+  see https://github.com/ratatui/ratatui/blob/main/examples/apps/tracing/src/main.rs
+- [ ] Show game options in the menu, and visually change them (tab, direction, using a Params struct, containing a vec
+  of ButtonWidget, implementing a vec of them, each one displaying
+  a list, prev/next, selected, and an internal index, so input just call function of it, in case of enter, start as
+  it !), start entering s
 - [ ] Enhance fruits eaten detection and grid management with multiple emojis as body
+- [ ] If you like this game and want to contribute to more amazing features, consider giving me a coffee
+  on [kofi](https://ko-fi.com/retrosnake)🥤
 
-## Installation Quick path
+## Installation
+
+### ✅ Prerequisites
+
+- 🦀 **Have Rust and compilation tools installed**  
+  If you don't have Rust yet:
+- On **Windows**, Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it works
+  Out-Of-The-Box on
+  windows)
+- On **Linux**/[Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd), See  
+  👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
+
+- 💻 **Use a terminal that supports emoji**
+    - On **Windows**, the default terminal supports emoji out of the box.
+    - On **Linux** / [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd), install the Noto Emoji font.
+      See  
+      👉 [Emoji font support](#Enable-Emoji-Font-Support) for instructions.
+
+### For this project
 
 - Clone this repository
   `git clone <url>`
-- Have Rust installed (if not see [Installation Long Path](#installation-long-path-for-windows) below)
-- Have a terminal that support emoji (Windows terminal does by default,
-  or install noto font on linux, instructions in  [Installation Long Path](#installation-long-path-for-linux) )
-- To run the game, run:`cargo run`
+- Go to the directory `cd rsnake`
+
+### Run the Game
+
+- To run the game, either:`cargo run` or `cargo run --manifest-path rsnake/Cargo.toml` (if in an another directory)
+- To see run options, use: `rsnake --help`
+- E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥`
 - To install the game as a command:  
   `cargo install --path .`  
   And then run the game with: `rsnake`
-- To see run options, use: `rsnake --help`
-- E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥`
 
-## Installation Long Path for Windows
+## Architecture
 
-- Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it works Out-Of-The-Box on
-  windows)
-- Emojis are supported by default on Terminal app
-- Download the repository (as zip and unzip or using git clone)
-- Then follow quick installation instructions
+- Uses `Arc` & `RwLock` for synchronization.
+- Spawns separate threads for input handling, rendering (60Hz), and game logic execution.
 
-## Installation Long Path for Linux
+## Documentation generation
 
-Make sure your system has `curl` and `git` installed:
+- `cargo doc --document-private-items --no-deps --open`
+
+## Tests
+
+- As usual run them with `cargo test` the project is set up with a lib containing all the code, and a main.rs just
+  calling it
+- As this is a widespread pattern providing full compliance with the Rust test ecosystem, allowing doc comment to be
+  automatically tested, for example.
+
+## Installation Rust and tools for Linux
+
+Make sure your system has `curl`, `gcc` and `git` installed:
 
 ```bash
 sudo apt update
-sudo apt install curl git -y
+sudo apt install curl git gcc -y
 ```
-
----
-
-## Install Rust
 
 Use the official installer `rustup`, or any alternative method on https://www.rust-lang.org/tools/install (by your own):
 
@@ -61,10 +90,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 - Follow the prompts in the terminal.
-- After installation, restart your terminal or run:
+- After installation, run:
 
 ```bash
-source "$HOME/.cargo/env"
+echo "source '$HOME/.cargo/env'" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 - Verify the installation:
@@ -99,7 +129,7 @@ sudo dnf install google-noto-emoji-color-fonts
 
 ---
 
-## Optional: Configure Font Fallback (if emojis still don’t render)
+## Optional: Configure Font Fallback (if emojis still do not render)
 
 Create or edit the following file:
 
@@ -141,22 +171,6 @@ echo "Rust is awesome! 🦀🔥🚀"
 You should see emojis rendered correctly in your terminal or text editors.
 
 - Then follow quick installation instructions
-
-## Architecture
-
-- Uses `Arc` & `RwLock` for synchronization.
-- Spawns separate threads for input handling, rendering (60Hz), and game logic execution.
-
-## Documentation generation
-
-- `cargo doc --document-private-items --no-deps --open`
-
-## Tests
-
-- As usual run them with `cargo test` the project is set up with a lib containing all the code, and a main.rs just
-  calling it
-- As this is a widespread pattern providing full compliance with the Rust test ecosystem, allowing doc comment to be
-  automatically tested, for example.
 
 ## References
 
