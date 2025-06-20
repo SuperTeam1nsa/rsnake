@@ -5,8 +5,13 @@ use crossterm::event::{KeyCode, KeyEventKind};
 use std::sync::{Arc, RwLock};
 
 const QUIT_KEYS: [KeyCode; 2] = [KeyCode::Char('q'), KeyCode::Char('Q')];
-const MENU_KEYS: [KeyCode; 2] = [KeyCode::Char('m'), KeyCode::Char('M')];
-const DIRECTIONAL_KEYS: [KeyCode; 4] = [KeyCode::Down, KeyCode::Up, KeyCode::Left, KeyCode::Right];
+const PARAMETERS_KEYS: [KeyCode; 2] = [KeyCode::Char('e'), KeyCode::Char('E')];
+const FRUITS_KEYS: [KeyCode; 2] = [KeyCode::Char('f'), KeyCode::Char('F')];
+const VELOCITY_KEYS: [KeyCode; 2] = [KeyCode::Char('s'), KeyCode::Char('P')];
+const HELP_KEYS: [KeyCode; 2] = [KeyCode::Char('h'), KeyCode::Char('H')];
+const MAIN_MENU_KEYS: [KeyCode; 2] = [KeyCode::Char('m'), KeyCode::Char('M')];
+//const DIRECTIONAL_KEYS: [KeyCode; 4] = [KeyCode::Down, KeyCode::Up, KeyCode::Left, KeyCode::Right];
+const START_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
 pub(crate) const PAUSE_KEYS: [KeyCode; 3] =
     [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
@@ -34,7 +39,7 @@ pub fn playing_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<Ga
                     gs.write().unwrap().status = GameStatus::ByeBye;
                     break;
                 //MENU
-                } else if MENU_KEYS.contains(&key.code) {
+                } else if MAIN_MENU_KEYS.contains(&key.code) {
                     gs.write().unwrap().status = GameStatus::Menu;
                     break;
                 //RESTART
@@ -58,9 +63,18 @@ pub fn playing_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<Ga
     }
 }
 
+#[derive(PartialEq, Clone, Debug)]
 pub enum GreetingOption {
     StartGame,
+    Parameters,
+    Fruits,
+    Velocity,
+    Help,
+    MainMenu,
     QuitGame,
+    Next,
+    Previous,
+    Enter,
 }
 /// Check input on greeting screen
 /// Return Some(GreetingOption) if input is valid, with the chosen Greeting Option, None otherwise
@@ -73,12 +87,32 @@ pub fn greeting_screen_manage_input() -> Option<GreetingOption> {
         match key.kind {
             //If a key is pressed
             KeyEventKind::Press => {
+                flush_input_buffer();
                 // If it is a directional key
-                if DIRECTIONAL_KEYS.contains(&key.code) {
+                if START_KEYS.contains(&key.code) {
                     Some(GreetingOption::StartGame)
                     // if it is a quit keys
                 } else if QUIT_KEYS.contains(&key.code) {
                     Some(GreetingOption::QuitGame)
+                } else if PARAMETERS_KEYS.contains(&key.code) {
+                    Some(GreetingOption::Parameters)
+                } else if FRUITS_KEYS.contains(&key.code) {
+                    Some(GreetingOption::Fruits)
+                } else if VELOCITY_KEYS.contains(&key.code) {
+                    Some(GreetingOption::Velocity)
+                } else if HELP_KEYS.contains(&key.code) {
+                    Some(GreetingOption::Help)
+                } else if MAIN_MENU_KEYS.contains(&key.code) {
+                    Some(GreetingOption::MainMenu)
+                } else if key.code == KeyCode::Right || key.code == KeyCode::Up {
+                    Some(GreetingOption::Next)
+                } else if key.code == KeyCode::Left
+                    || key.code == KeyCode::Backspace
+                    || key.code == KeyCode::Down
+                {
+                    Some(GreetingOption::Previous)
+                } else if key.code == KeyCode::Enter {
+                    Some(GreetingOption::Enter)
                 } else {
                     None
                 }
@@ -87,5 +121,10 @@ pub fn greeting_screen_manage_input() -> Option<GreetingOption> {
         }
     } else {
         None
+    }
+}
+fn flush_input_buffer() {
+    while crossterm::event::poll(std::time::Duration::from_secs(0)).unwrap_or(false) {
+        let _ = crossterm::event::read(); // Discard any buffered events
     }
 }

@@ -10,6 +10,9 @@ crossterm = { version = "0.29.0", features = ["events"] }
 ratatui = { version = "0.30.0-alpha.2", features = ["unstable-widget-ref"] }
 rand = "0.9.1"
 clap = { version = "4.5.37", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
+toml = "0.8.22"
+
 
 #For testing cli easly
 [dev-dependencies]

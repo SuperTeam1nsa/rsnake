@@ -82,6 +82,14 @@ impl<'a> GraphicBlock<'a> {
     pub fn get_position(&self) -> &Position {
         &self.position
     }
+    /// Retrieves the current position of the graphic block.
+    ///
+    /// # Returns
+    /// A reference to the current position of the graphic block.
+    #[must_use]
+    pub fn get_content(&self) -> &str {
+        &self.image.content
+    }
 }
 ///NB: Could also have used impl Widget for &T even if more limited
 /// see: <https://github.com/ratatui/ratatui/discussions/1274>
