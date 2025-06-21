@@ -16,7 +16,7 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::controls::speed::Speed;
+//! use rsnaker::controls::speed::Speed;
 //!
 //! let fast_speed = Speed::Fast;
 //! println!("Speed value: {}", fast_speed.ms_value());

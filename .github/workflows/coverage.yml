@@ -9,6 +9,7 @@ on:
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
+    environment: codecov
 
     steps:
       - name: Checkout source code

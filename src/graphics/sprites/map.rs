@@ -55,8 +55,8 @@ impl Map<'_> {
     /// # Example
     /// ```rust
     /// use ratatui::layout::Rect;
-    /// use rsnake::graphics::graphic_block::Position;
-    /// use rsnake::graphics::sprites::map::Map;
+    /// use rsnaker::graphics::graphic_block::Position;
+    /// use rsnaker::graphics::sprites::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// assert!(map.out_of_map(&position));
@@ -83,8 +83,8 @@ impl Map<'_> {
     /// # Example
     /// ```rust
     /// use ratatui::layout::Rect;
-    /// use rsnake::graphics::graphic_block::Position;
-    /// use rsnake::graphics::sprites::map::Map;
+    /// use rsnaker::graphics::graphic_block::Position;
+    /// use rsnaker::graphics::sprites::map::Map;
     /// let map = Map::new(10, Rect::new(0, 0, 100, 40));
     /// let position = Position { x: 101, y: 20 };
     /// let new_position = map.out_of_map_reverse_position(&position);

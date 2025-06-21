@@ -2,7 +2,7 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 
-use rsnake::start_snake;
+use rsnaker::start_snake;
 // Basic to get the number of lines without comments and blanks:
 // find . -name '*.rs' -not -path "./target/*" -print0 | xargs -0 cat | grep -v '^\s*$' | grep -v '^\s*//' | wc -l
 // including comments without blanks:

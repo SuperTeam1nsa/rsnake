@@ -6,7 +6,7 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::game_logic::state::{GameState, GameStatus};
+//! use rsnaker::game_logic::state::{GameState, GameStatus};
 //!
 //! let mut state = GameState::new(3); // Initialize game_logic with 3 lives
 //! assert_eq!(state.life, 3);

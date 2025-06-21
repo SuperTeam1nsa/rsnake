@@ -7,8 +7,8 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::graphics::sprites::fruit::Fruit;
-//! use rsnake::graphics::graphic_block::Position;
+//! use rsnaker::graphics::sprites::fruit::Fruit;
+//! use rsnaker::graphics::graphic_block::Position;
 //!
 //! let position = Position { x: 5, y: 10 };
 //! let apple = Fruit::new(40, 2,position, "🍎");

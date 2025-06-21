@@ -6,11 +6,11 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::game_logic::fruits_manager::FruitsManager;
-//! use rsnake::graphics::sprites::map::Map;
+//! use rsnaker::game_logic::fruits_manager::FruitsManager;
+//! use rsnaker::graphics::sprites::map::Map;
 //! use std::sync::{Arc, RwLock};
 //! use ratatui::layout::Rect;
-//! use rsnake::graphics::graphic_block::Position;
+//! use rsnaker::graphics::graphic_block::Position;
 //!
 //! let case_size = 2;
 //! let map_size = Rect::new(0, 0, 200, 10);
@@ -51,8 +51,8 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     /// ```
     /// use std::sync::{Arc, RwLock};
     /// use ratatui::layout::Rect;
-    /// use rsnake::game_logic::fruits_manager::FruitsManager;
-    /// use rsnake::graphics::sprites::map::Map;
+    /// use rsnaker::game_logic::fruits_manager::FruitsManager;
+    /// use rsnaker::graphics::sprites::map::Map;
     /// let x =42;
     /// let map = Arc::new(RwLock::new(Map::new(2, Rect::new(0,0, 160,10))));
     /// let manager = FruitsManager::new(3, map);

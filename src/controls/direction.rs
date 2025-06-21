@@ -4,7 +4,7 @@
 //!
 //! # Example
 //! ```rust
-//! use rsnake::controls::direction::Direction;
+//! use rsnaker::controls::direction::Direction;
 //!
 //! let dir = Direction::Up;
 //! match dir {

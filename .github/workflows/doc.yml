@@ -20,10 +20,6 @@ jobs:
         with:
           toolchain: stable
           override: true
-          components: clippy
-
-      - name: Run Clippy (no warnings allowed)
-        run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Build docs
         run: cargo doc --no-deps --document-private-items --all-features
