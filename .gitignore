@@ -19,3 +19,4 @@ Cargo.lock
 /target/profiling
 /target/llvm-cov-target
 /target/package
+/target

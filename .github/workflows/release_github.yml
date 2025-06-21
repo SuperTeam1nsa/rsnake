@@ -17,8 +17,8 @@ jobs:
             bin_ext: ""
 
           - os: windows-latest
-            target: x86_64-pc-windows-gnu
-            bin_ext: ".exe"
+            target: x86_64-pc-windows-msvc # NB: on Windows two majors build-chains: x86_64-pc-windows-gnu & x86_64-pc-windows-msvc
+            bin_ext: ".exe"  #On github action already windows-latest has Visual Studio Build Tools, so better windows version
 
           - os: macos-latest
             target: x86_64-apple-darwin

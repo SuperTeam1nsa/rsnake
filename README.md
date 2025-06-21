@@ -97,7 +97,7 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - And run `cargo llvm-cov --open`
 - A great coverage is not a goal for this project (tests are only there to showcase tests in rust),
 - For reference the current coverage
-  is :[![codecov](https://codecov.io/gh/FromTheRags/rsnake/graph/badge.svg?token=XJXII0CMQF)](https://codecov.io/gh/FromTheRags/rsnake)
+  is :
   [![codecov](https://codecov.io/gh/fromtherags/rsnake/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
 
 ## Installation Rust and tools for Linux
