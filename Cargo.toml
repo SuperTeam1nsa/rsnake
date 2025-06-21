@@ -2,6 +2,12 @@
 name = "rsnake"
 version = "0.1.0"
 edition = "2024"
+authors = ["RF"]
+description = "A good old retro Snake in terminal UI"
+license = "GPL-3"
+repository = "https://github.com/FromTheRags/rsnake"
+documentation = "https://docs.rs/rsnakeTUI"
+readme = "README.md"
 
 [dependencies]
 crossterm = { version = "0.29.0", features = ["events"] }

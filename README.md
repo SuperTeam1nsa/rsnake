@@ -1,3 +1,13 @@
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+[![Rust](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml)
+[![crates.io](https://img.shields.io/crates/v/nom_du_crate.svg)](https://crates.io/crates/rsnake)
+[![docs](https://img.shields.io/badge/docs-online-blue)](https://FromTheRags.github.io/docs/rsnake)
+[![Clippy]](https://github.com/user/repo/actions/workflows/clippy.yml/badge.svg)
+[![codecov](https://codecov.io/gh/user/repo/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
+[![Last Commit](https://img.shields.io/github/last-commit/user/repo)](https://github.com/FromTheRags/rsnake/commits)
+[![Issues](https://img.shields.io/github/issues/user/repo)](https://github.com/FromTheRags/rsnake/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/user/repo)](https://github.com/FromTheRags/rsnake/pulls)
+
 # Snake Game using Ratatui
 
 It is a terminal-based snake game using the Ratatui crate for rendering.
@@ -22,8 +32,12 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
   a list, prev/next, selected, and an internal index, so input just call function of it, in case of enter, start as
   it !), start entering s
 - [ ] Enhance fruits eaten detection and grid management with multiple emojis as body
-- [ ] If you like this game and want to contribute to more amazing features, consider giving me a coffee
-  on [kofi](https://ko-fi.com/retrosnake)🥤
+
+- ## 💖 Support
+- If you like this game and want to contribute to more amazing features, consider giving me a coffee
+  on [kofi](https://ko-fi.com/retrosnake)
+  🥤or ***REMOVED***
+  to support development.
 
 ## Installation
 
@@ -73,6 +87,13 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
   calling it
 - As this is a widespread pattern providing full compliance with the Rust test ecosystem, allowing doc comment to be
   automatically tested, for example.
+- To have a coverage report, install `llvm-cov`:
+  `rustup component add llvm-tools-preview
+  cargo install cargo-llvm-cov`
+- And run `cargo llvm-cov --open`
+- A great coverage is not a goal for this project (tests are only there to showcase tests in rust),
+- For reference the current coverage
+  is :[![codecov](https://codecov.io/gh/FromTheRags/rsnake/graph/badge.svg?token=XJXII0CMQF)](https://codecov.io/gh/FromTheRags/rsnake)
 
 ## Installation Rust and tools for Linux
 
@@ -177,3 +198,5 @@ You should see emojis rendered correctly in your terminal or text editors.
 - Clippy lints: <https://github.com/rust-lang/rust-clippy/>
 - Ratatui tutorial: <https://ratatui.rs/tutorials/hello-world/>
 - Example: <https://ratatui.rs/examples/widgets/canvas/>
+
+[![Contributors](https://img.shields.io/github/contributors/user/repo)](https://github.com/user/repo/graphs/contributors)

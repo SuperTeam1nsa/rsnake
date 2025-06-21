@@ -46,6 +46,7 @@ impl<T> SelectableList<T> {
         }
     }
 
+    #[must_use]
     pub fn selected_item(&self) -> &T {
         &self.items[self.selected]
     }

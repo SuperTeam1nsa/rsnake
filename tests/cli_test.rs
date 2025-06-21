@@ -8,7 +8,7 @@ use std::time::Instant;
 fn test_cli_fails_on_invalid_velocity() {
     let mut cmd = Command::cargo_bin("rsnake").unwrap();
 
-    cmd.arg("--velocity")
+    cmd.arg("--speed")
         .arg("super_sonic") // invalide
         .arg("--life")
         .arg("3")
@@ -30,7 +30,7 @@ fn test_cli_fails_on_invalid_velocity() {
 fn test_cli_runs_with_default_args() {
     let now = Instant::now();
     let mut cmd = Command::cargo_bin("rsnake").unwrap(); // "snake" see in Cargo.toml [[bin]]
-    cmd.arg("--velocity")
+    cmd.arg("--speed")
         .arg("fast")
         .arg("--life")
         .arg("3")
