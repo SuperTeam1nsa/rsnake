@@ -1,9 +1,10 @@
-[![crates.io](https://img.shields.io/crates/v/nom_du_crate.svg)](https://crates.io/crates/rsnaker)
+[![crates.io](https://img.shields.io/crates/v/rsnaker.svg)](https://crates.io/crates/rsnaker)
+[![Doc.rs](https://docs.rs/rsnaker/badge.svg)](https://docs.rs/rsnaker)
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![Last Commit](https://img.shields.io/github/last-commit/fromtherags/rsnake)](https://github.com/FromTheRags/rsnake/commits)
 [![Build](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml)
 [![Test](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml)
-[![docs](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnaker/index.html)
+[![Last doc](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnaker/index.html)
 
 # Snake Game using Ratatui
 

@@ -5,6 +5,7 @@ edition = "2024"
 authors = ["RF"]
 description = "A good old retro Snake in terminal UI"
 license = "GPL-3.0-only"
+documentation = "https://docs.rs/rsnaker"
 repository = "https://github.com/FromTheRags/rsnake"
 readme = "README.md"
 keywords = ["Ratatui", "TUI", "Snake", "Game", "retro"]
