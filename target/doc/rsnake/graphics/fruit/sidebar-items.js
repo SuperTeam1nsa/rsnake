@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["FRUITS_SCORES_PROBABILITIES"],"struct":["Fruit"]};

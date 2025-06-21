@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Velocity"],"fn":["iter_speed_variants"],"struct":["Speed"]};
