@@ -33,11 +33,11 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
   it !), start entering s
 - [ ] Enhance fruits eaten detection and grid management with multiple emojis as body
 
-- ## 💖 Support
+## 💖 Support
+
 - If you like this game and want to contribute to more amazing features, consider giving me a coffee
   on [kofi](https://ko-fi.com/retrosnake)
-  🥤or ***REMOVED***
-  to support development.
+  🥤to support development.
 
 ## Installation
 
@@ -198,5 +198,6 @@ You should see emojis rendered correctly in your terminal or text editors.
 - Clippy lints: <https://github.com/rust-lang/rust-clippy/>
 - Ratatui tutorial: <https://ratatui.rs/tutorials/hello-world/>
 - Example: <https://ratatui.rs/examples/widgets/canvas/>
+- Git over-bloated: <https://rtyley.github.io/bfg-repo-cleaner/>
 
-[![Contributors](https://img.shields.io/github/contributors/user/repo)](https://github.com/user/repo/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/fromtherags/rsnake)](https://github.com/fromtherags/rsnake/graphs/contributors)

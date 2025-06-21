@@ -10,7 +10,7 @@ jobs:
     name: cargo publish
     runs-on: ubuntu-latest
     environment: crates_io
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
