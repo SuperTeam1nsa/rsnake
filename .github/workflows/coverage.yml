@@ -1,4 +1,4 @@
-name: coverage.yml
+name: coverage
 
 on:
   push:

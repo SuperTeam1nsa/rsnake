@@ -1,12 +1,12 @@
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![Rust](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml)
 [![crates.io](https://img.shields.io/crates/v/nom_du_crate.svg)](https://crates.io/crates/rsnake)
-[![docs](https://img.shields.io/badge/docs-online-blue)](https://FromTheRags.github.io/docs/rsnake)
-[![Clippy]](https://github.com/user/repo/actions/workflows/clippy.yml/badge.svg)
-[![codecov](https://codecov.io/gh/user/repo/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
-[![Last Commit](https://img.shields.io/github/last-commit/user/repo)](https://github.com/FromTheRags/rsnake/commits)
-[![Issues](https://img.shields.io/github/issues/user/repo)](https://github.com/FromTheRags/rsnake/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/user/repo)](https://github.com/FromTheRags/rsnake/pulls)
+[![docs](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnake/index.html)
+[![Clippy](https://github.com/FromTheRags/rsnake/actions/workflows/doc.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/doc.yml)
+[![codecov](https://codecov.io/gh/fromtherags/rsnake/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
+[![Last Commit](https://img.shields.io/github/last-commit/fromtherags/rsnake)](https://github.com/FromTheRags/rsnake/commits)
+[![Issues](https://img.shields.io/github/issues/fromtherags/rsnake)](https://github.com/FromTheRags/rsnake/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/fromtherags/rsnake)](https://github.com/FromTheRags/rsnake/pulls)
 
 # Snake Game using Ratatui
 
