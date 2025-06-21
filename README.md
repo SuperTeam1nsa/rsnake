@@ -4,7 +4,6 @@
 [![Build](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml)
 [![Test](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml)
 [![docs](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnake/index.html)
-[![codecov](https://codecov.io/gh/fromtherags/rsnake/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
 
 # Snake Game using Ratatui
 
@@ -92,6 +91,7 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - A great coverage is not a goal for this project (tests are only there to showcase tests in rust),
 - For reference the current coverage
   is :[![codecov](https://codecov.io/gh/FromTheRags/rsnake/graph/badge.svg?token=XJXII0CMQF)](https://codecov.io/gh/FromTheRags/rsnake)
+  [![codecov](https://codecov.io/gh/fromtherags/rsnake/branch/main/graph/badge.svg)](https://codecov.io/gh/FromTheRags/rsnake)
 
 ## Installation Rust and tools for Linux
 

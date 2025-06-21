@@ -25,8 +25,10 @@ fn test_cli_fails_on_invalid_velocity() {
         .failure()
         .stderr(contains("error").and(contains("super_sonic")));
 }
-
+/// Ignore as fail on no TTY (as on github action) because of raw terminal mode
+/// can be run locally with cargo test -- --ignored
 #[test]
+#[ignore]
 fn test_cli_runs_with_default_args() {
     let now = Instant::now();
     let mut cmd = Command::cargo_bin("rsnake").unwrap(); // "snake" see in Cargo.toml [[bin]]
