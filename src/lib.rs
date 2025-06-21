@@ -51,7 +51,17 @@ use std::cmp::max;
 /// If bad characters (invalid size) are provided for snake body or head
 pub fn start_snake() {
     // get command line options and parsed them to check for errors
-    let args = GameOptions::parse();
+    let mut args = GameOptions::parse();
+    args.validate_and_adapt();
+    //load or save as wished, for the easiest use hard-coded path,as people using it will not like cli
+    if args.save {
+        args.save_to_toml(game_logic::game_options::SAVE_FILE)
+            .expect("Fail to save Snake configuration file");
+    }
+    if args.load {
+        args = GameOptions::load_from_toml(game_logic::game_options::SAVE_FILE)
+            .expect("Fail to load Snake configuration file");
+    }
     // If everything is OK, inits terminal for rendering
     let mut terminal = ratatui::init();
     //ratatui using UnicodeWidthStr crates as dep

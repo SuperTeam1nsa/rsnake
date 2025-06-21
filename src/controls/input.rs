@@ -12,13 +12,21 @@ const HELP_KEYS: [KeyCode; 2] = [KeyCode::Char('h'), KeyCode::Char('H')];
 const MAIN_MENU_KEYS: [KeyCode; 2] = [KeyCode::Char('m'), KeyCode::Char('M')];
 //const DIRECTIONAL_KEYS: [KeyCode; 4] = [KeyCode::Down, KeyCode::Up, KeyCode::Left, KeyCode::Right];
 const START_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
-pub(crate) const PAUSE_KEYS: [KeyCode; 3] =
-    [KeyCode::Char('p'), KeyCode::Char('P'), KeyCode::Char(' ')];
+pub(crate) const PAUSE_KEYS: [KeyCode; 4] = [
+    KeyCode::Char('p'),
+    KeyCode::Char('P'),
+    KeyCode::Char(' '),
+    KeyCode::Home,
+];
 const RESET_KEYS: [KeyCode; 2] = [KeyCode::Char('r'), KeyCode::Char('R')];
+const NEXT_KEYS: [KeyCode; 2] = [KeyCode::Right, KeyCode::Up];
+const PREVIOUS_KEYS: [KeyCode; 3] = [KeyCode::Left, KeyCode::Backspace, KeyCode::Down];
+const ENTER_KEYS: [KeyCode; 2] = [KeyCode::Enter, KeyCode::End];
+
 /// You cannot block middle-click paste/scroll behavior from inside your Rust TUI app.
 /// If you really want to disable it, you would have to modify user system settings or terminal emulator config
 /// (e.g., in alacritty, kitty, gnome-terminal, etc.)
-/// That is outside the app’s control
+/// That is outside the app's control
 /// # Panics
 /// if Arc panic while holding the resources (poisoning), no recovery mechanism implemented better crash
 pub fn playing_input_loop(direction: &Arc<RwLock<Direction>>, gs: &Arc<RwLock<GameState>>) {
@@ -104,14 +112,11 @@ pub fn greeting_screen_manage_input() -> Option<GreetingOption> {
                     Some(GreetingOption::Help)
                 } else if MAIN_MENU_KEYS.contains(&key.code) {
                     Some(GreetingOption::MainMenu)
-                } else if key.code == KeyCode::Right || key.code == KeyCode::Up {
+                } else if NEXT_KEYS.contains(&key.code) {
                     Some(GreetingOption::Next)
-                } else if key.code == KeyCode::Left
-                    || key.code == KeyCode::Backspace
-                    || key.code == KeyCode::Down
-                {
+                } else if PREVIOUS_KEYS.contains(&key.code) {
                     Some(GreetingOption::Previous)
-                } else if key.code == KeyCode::Enter {
+                } else if ENTER_KEYS.contains(&key.code) {
                     Some(GreetingOption::Enter)
                 } else {
                     None

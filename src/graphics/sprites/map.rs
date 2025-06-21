@@ -32,9 +32,8 @@ impl Map<'_> {
     #[must_use]
     pub fn new<'a>(case_size_in_px: u16, viewport: Rect) -> Map<'a> {
         Map {
-            block: Block::bordered()
-                .border_type(BorderType::Double)
-                .title("Snake !"),
+            block: Block::bordered().border_type(BorderType::Double),
+            //.title("Snake !"),
             case_size: case_size_in_px,
             viewport,
         }

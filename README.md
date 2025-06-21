@@ -3,7 +3,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/fromtherags/rsnake)](https://github.com/FromTheRags/rsnake/commits)
 [![Build](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/rust.yml)
 [![Test](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml/badge.svg)](https://github.com/FromTheRags/rsnake/actions/workflows/test.yml)
-[![docs](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnake/index.html)
+[![docs](https://img.shields.io/badge/docs-online-blue)](https://fromtherags.github.io/rsnake/rsnaker/index.html)
 
 # Snake Game using Ratatui
 
@@ -17,18 +17,17 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - **Game Logic**: Manages snake movement, collisions, and scoring.
 - **Multithreading**: Uses multiple threads for input handling, rendering at 60 FPS, and game logic execution.
 - **Emoji-based graphics**: Supports rendering the snake using emojis instead of ASCII.
-- **Configurable parameters**: With `clap` for command-line arguments.
+- **Configurable parameters**: With `clap` for command-line arguments & toml file.
 
 ## TODO
 
 - [ ] Add a save score (local db) with a pseudo got from cmdline
-- [ ] Add some performance log with tracing, for example,
-  see https://github.com/ratatui/ratatui/blob/main/examples/apps/tracing/src/main.rs
-- [ ] Show game options in the menu, and visually change them (tab, direction, using a Params struct, containing a vec
-  of ButtonWidget, implementing a vec of them, each one displaying
-  a list, prev/next, selected, and an internal index, so input just call function of it, in case of enter, start as
-  it !), start entering s
+- [ ] Add some performance log with tracing,
+  for [example](https://github.com/ratatui/ratatui/blob/main/examples/apps/tracing/src/main.rs)
+- [ ] Show game options in the menu, and visually change them
 - [ ] Enhance fruits eaten detection and grid management with multiple emojis as body
+- [ ] Manage mouse/touchscreen mouvement to control the snake
+- [ ] Internal code: Provide a macro exemple for trait implementation widget and this error use.
 
 ## 💖 Support
 
@@ -45,26 +44,33 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - On **Windows**, Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it works
   Out-Of-The-Box on
   windows)
-- On **Linux**/[Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd), See  
+- On **Linux** See  
   👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
+- On **Android** use a linux emulator and follow same instruction as linux, tested with:
+    - [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd),
+    - [Termux](https://github.com/termux/termux-app)
+      For easier use, END key works as ENTER and HOME as a pause key.
 
 - 💻 **Use a terminal that supports emoji**
     - On **Windows**, the default terminal supports emoji out of the box.
-    - On **Linux** / [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd), install the Noto Emoji font.
+    - On **Linux** / Android, if need install the Noto Emoji font.
       See  
       👉 [Emoji font support](#Enable-Emoji-Font-Support) for instructions.
 
 ### For this project
 
 - Clone this repository
-  `git clone <url>`
+  `git clone https://github.com/FromTheRags/rsnake.git`
 - Go to the directory `cd rsnake`
 
 ### Run the Game
 
-- To run the game, either:`cargo run` or `cargo run --manifest-path rsnake/Cargo.toml` (if in an another directory)
+- To run the game, either:`cargo run` or `cargo run --manifest-path rsnake/Cargo.toml` (if in another directory)
 - To see run options, use: `rsnake --help`
 - E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥`
+- To save a set of commands, create and alias or use `--save` to generate to a snake_config.toml file near the
+  executable.
+- Then load with `--load` option. [Shipped one](snake_config.toml)
 - To install the game as a command:  
   `cargo install --path .`  
   And then run the game with: `rsnake`

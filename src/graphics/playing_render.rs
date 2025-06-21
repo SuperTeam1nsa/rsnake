@@ -12,9 +12,8 @@ use std::time::{Duration, Instant};
 
 ///Position to render elements
 ///will be clamped to the frame area border anyway, 9999 to go to the last line allowing easy resizing
-const FPS_RECT: Rect = Rect::new(1, 9999, 55, 1);
-const SCORE_RECT: Rect = Rect::new(10, 0, 15, 1);
-const LIFE_RECT: Rect = Rect::new(40, 0, 60, 1);
+const BOTTOM_SPEED_FPS_SCORE_RECT: Rect = Rect::new(1, 9999, 70, 1);
+const LIFE_RECT: Rect = Rect::new(1, 0, 60, 1);
 const NB_OF_FRAMES_WINDOW: f64 = 1_000.0;
 const TOO_MUCH_LIVES_TO_DISPLAY: &str = " life: ❤️❤️❤️❤️❤️... ";
 /// # Panics                                                                                              
@@ -70,22 +69,21 @@ pub fn playing_render_loop<'a: 'b, 'b>(
                     fruits_manager.write().unwrap().resize_to_terminal();
                     need_carte_resize = false;
                 }
-                //FPS & snake speed
-                frame.render_widget(
-                    Paragraph::new(format!(
-                        "{speed_text} FPS: {} ",
-                        (frame_count / start_windows_time.elapsed().as_secs_f64()).floor()
-                    )),
-                    FPS_RECT.clamp(frame.area()),
-                );
+                //sub scope to release the lock faster
+                {
+                    //snake speed & FPS & Score
+                    frame.render_widget(
+                        Paragraph::new(format!(
+                            "{speed_text} | FPS: {} | Score: {} ",
+                            (frame_count / start_windows_time.elapsed().as_secs_f64()).floor(),
+                            state.read().unwrap().score
+                        )),
+                        BOTTOM_SPEED_FPS_SCORE_RECT.clamp(frame.area()),
+                    );
+                }
                 //sub scope to release the lock faster
                 {
                     let state_guard = state.read().unwrap();
-                    //score
-                    frame.render_widget(
-                        Paragraph::new(format!(" Score: {} ", state_guard.score)),
-                        SCORE_RECT.clamp(area),
-                    );
                     //life
                     let life = state_guard.life as usize;
                     frame.render_widget(
