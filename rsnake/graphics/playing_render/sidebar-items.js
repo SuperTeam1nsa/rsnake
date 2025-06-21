@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FPS_RECT","LIFE_RECT","NB_OF_FRAMES_WINDOW","SCORE_RECT","TOO_MUCH_LIVES_TO_DISPLAY"],"fn":["game_state_render","playing_render_loop"]};

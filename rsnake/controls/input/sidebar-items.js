@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FRUITS_KEYS","HELP_KEYS","MAIN_MENU_KEYS","PARAMETERS_KEYS","PAUSE_KEYS","QUIT_KEYS","RESET_KEYS","START_KEYS","VELOCITY_KEYS"],"enum":["GreetingOption"],"fn":["flush_input_buffer","greeting_screen_manage_input","playing_input_loop"]};
