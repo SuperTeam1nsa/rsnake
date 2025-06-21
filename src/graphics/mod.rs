@@ -1,3 +1,4 @@
+//! # Game graphical Modules
 //! This module contains the core components of the game logic, it includes the following submodules:
 //!
 //! - [`graphic_block`]: Handles the graphical rendering of game logic blocks in the terminal.

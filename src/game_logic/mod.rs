@@ -1,4 +1,4 @@
-//! # Game Modules
+//! # Game logic Modules
 //!
 //! This module organizes various components of the game logic, including:
 //!

@@ -45,7 +45,7 @@ fn test_cli_runs_with_default_args() {
         .timeout(std::time::Duration::from_secs(10))
         .assert()
         .stdout(contains("Have a good game !"))
-        .stderr(contains("")); // timeout à 5s
+        .stderr(contains("").or(contains("No such device or address"))); // timeout 10s, or for github action
 
     let elapsed = now.elapsed();
 

@@ -1,4 +1,4 @@
-name: Deploy Rust Docs
+name: doc
 
 on:
   push:
