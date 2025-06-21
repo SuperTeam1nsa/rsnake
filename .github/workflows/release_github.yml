@@ -38,11 +38,20 @@ jobs:
       - name: Build release binary
         run: cargo build --release --target=${{ matrix.target }}
 
-      - name: Rename output binary
+      - name: Rename output binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           mkdir -p dist
           cp target/${{ matrix.target }}/release/rsnake${{ matrix.bin_ext }} \
              dist/rsnake-${{ matrix.target }}${{ matrix.bin_ext }}
+
+      - name: Rename output binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir dist
+          copy target\${{ matrix.target }}\release\rsnake.exe dist\rsnake-${{ matrix.target }}.exe
+
 
       - name: Upload binaries to GitHub Release
         uses: softprops/action-gh-release@v2
