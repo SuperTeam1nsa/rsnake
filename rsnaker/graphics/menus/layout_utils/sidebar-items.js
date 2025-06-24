@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["frame_vertically_centered_rect","render_full_centered_paragraph"]};

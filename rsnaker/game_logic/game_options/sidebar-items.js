@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INI_POSITION","PARAMS_HEADER","SAVE_FILE"],"struct":["GameOptions"]};

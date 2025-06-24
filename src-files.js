@@ -1,0 +1,3 @@
+var srcIndex = new Map(JSON.parse('[["rsnake",["",[],["main.rs"]]],["rsnaker",["",[["controls",[],["direction.rs","input.rs","mod.rs","speed.rs"]],["game_logic",[],["fruits_manager.rs","game_options.rs","mod.rs","playing_logic.rs","playing_thread_manager.rs","state.rs"]],["graphics",[["menus",[],["greeting_menu.rs","layout_utils.rs","mod.rs","parameters_menu.rs","selectable_item.rs","status.rs"]],["sprites",[],["fruit.rs","map.rs","mod.rs","snake_body.rs"]]],["graphic_block.rs","mod.rs","playing_render.rs"]]],["lib.rs"]]]]'));
+createSrcSidebar();
+//{"start":36,"fragment_lengths":[30,461]}
