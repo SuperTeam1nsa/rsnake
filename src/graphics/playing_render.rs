@@ -36,6 +36,7 @@ pub fn playing_render_loop<'a: 'b, 'b>(
     let mut frame_count = 0f64;
     let mut start_windows_time = Instant::now();
     let mut start_frame_time: Instant;
+    let target_frame_time = Duration::from_secs_f64(1.0 / 60.0); // Target 60 FPS
 
     //As quick as efficient as possible
     //Avoid sub functions to limit arc clone, otherwise create a display structure
@@ -120,9 +121,12 @@ pub fn playing_render_loop<'a: 'b, 'b>(
             //nice labeled loop :)
             break 'render_loop;
         }
-        //If you want to reduce CPU usage, caps to approx 60 FPS (some ms reserved for processing rendering and measured s time elapsed)
-        if !uncaps_fps {
-            sleep(Duration::from_millis(16).saturating_sub(start_frame_time.elapsed()));
+        //time to display the current frame
+        let frame_time = start_frame_time.elapsed();
+        // If you want to reduce CPU usage, maintain consistent frame timing
+        // If the frame generation takes longer than the target, no need to sleep (already sub 60 fps)
+        if !uncaps_fps && frame_time < target_frame_time {
+            sleep(target_frame_time.saturating_sub(frame_time));
         }
     }
 }

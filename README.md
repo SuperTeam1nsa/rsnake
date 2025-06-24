@@ -36,45 +36,65 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
   on [kofi](https://ko-fi.com/retrosnake)
   🥤to support development.
 
-## Installation
+## Run Game options
+
+- To see run options, use: `rsnake --help`
+- E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥` (if from source)
+- To save a set of commands, create and alias or use `--save` to generate to a snake_config.toml file near the
+  executable.
+- Then load with `--load` option. [Shipped one](snake_config.toml)
+
+## Installation from release
+
+### ✅ Prerequisites
+
+- 💻 **Use a terminal that supports emoji**
+    - On **Windows**,the [new microsoft terminal](https://apps.microsoft.com/detail/9n0dx20hk701?hl=en-us&gl=US) shipped
+      with w11 (and compatible w10) supports emoji out of the box among other improvements.
+    - On **Linux** / Android, if need install the Noto Emoji font :
+      👉 [Emoji font support](#Enable-Emoji-Font-Support) for instructions.
+    - Some screen display can flicker at 60 FPS in the terminal, use a decent display or an external monitor.
+
+### Running
+
+- Download the latest release from the [releases page](https://github.com/FromTheRags/rsnake/releases) according to your
+  OS.
+- Run the executable using the terminal or double click on the file if your OS support it.
+- For windows:
+    - Search for "Terminal" in the search menu to launch it and **set as default** (to be able to run the snake by
+      double clicking the .exe) or run rsnake from the terminal
+      with: cd <download path> then .\rsnake-x86_64-pc-windows-msvc.exe
+- For Linux/macOS/android:
+    - cd <download path> then ./rsnake-x86_64-unknown-linux-gnu (or ./rsnake-x86_64-apple-darwin on macOS)
+    - Or use the executable directly if you have it in your PATH.
+- See [Run option below for more details](#Run-Game-options).
+
+### Installation from source
 
 ### ✅ Prerequisites
 
 - 🦀 **Have Rust and compilation tools installed**  
   If you don't have Rust yet:
-- On **Windows**, Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it works
-  Out-Of-The-Box on
-  windows)
-- On **Linux** See  
-  👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
-- On **Android** use a linux emulator and follow same instruction as linux, tested with:
-    - [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd),
-    - [Termux](https://github.com/termux/termux-app)
-      For easier use, END key works as ENTER and HOME as a pause key.
+    - On **Windows**, Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it
+      works
+      Out-Of-The-Box on windows)
+    - On **Linux** See  
+      👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
+    - On **Android** use a linux emulator and follow same instruction as linux, tested with:
+        - [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd),
+        - [Termux](https://github.com/termux/termux-app)
+          For easier use, END key works as ENTER and HOME as a pause key.
 
-- 💻 **Use a terminal that supports emoji**
-    - On **Windows**, the default terminal supports emoji out of the box.
-    - On **Linux** / Android, if need install the Noto Emoji font.
-      See  
-      👉 [Emoji font support](#Enable-Emoji-Font-Support) for instructions.
-
-### For this project
+### Running
 
 - Clone this repository
   `git clone https://github.com/FromTheRags/rsnake.git`
 - Go to the directory `cd rsnake`
-
-### Run the Game
-
 - To run the game, either:`cargo run` or `cargo run --manifest-path rsnake/Cargo.toml` (if in another directory)
-- To see run options, use: `rsnake --help`
-- E.g., `rsnake -z 🐼 -b 🍥` or `cargo run -- -z 🐼 -b 🍥`
-- To save a set of commands, create and alias or use `--save` to generate to a snake_config.toml file near the
-  executable.
-- Then load with `--load` option. [Shipped one](snake_config.toml)
 - To install the game as a command:  
   `cargo install --path .`  
   And then run the game with: `rsnake`
+- See [Run option below for more details](#Run-Game-options).
 
 ## Architecture
 

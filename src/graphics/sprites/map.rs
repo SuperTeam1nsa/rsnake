@@ -96,6 +96,12 @@ impl Map<'_> {
         let y_max = self.viewport.height - 2;
         let x_min = self.case_size;
         let y_min = 1;
+
+        //to keep the grid coherent
+        let x_remainder = (x_max - x_min) % self.case_size;
+        let x_max = x_max - x_remainder; // adjusted
+        // y automatic as %1
+
         if *y > y_max {
             Position { x: *x, y: y_min }
         } else if *y < y_min {
@@ -108,7 +114,6 @@ impl Map<'_> {
             Position { x: *x, y: *y }
         }
     }
-
     /// Returns the current viewport (the visible area) of the map.
     ///
     /// # Returns
