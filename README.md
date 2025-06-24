@@ -63,13 +63,14 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
 - For windows:
     - Search for "Terminal" in the search menu to launch it and **set as default** (to be able to run the snake by
       double clicking the .exe) or run rsnake from the terminal
-      with: cd <download path> then .\rsnake-x86_64-pc-windows-msvc.exe
+      with:
+    - `cd "download path"` then `.\rsnake-x86_64-pc-windows-msvc.exe`
 - For Linux/macOS/android:
-    - cd <download path> then ./rsnake-x86_64-unknown-linux-gnu (or ./rsnake-x86_64-apple-darwin on macOS)
+    - `cd "download path" && ./rsnake-x86_64-unknown-linux-gnu` (or `./rsnake-x86_64-apple-darwin` on macOS)
     - Or use the executable directly if you have it in your PATH.
 - See [Run option below for more details](#Run-Game-options).
 
-### Installation from source
+## Installation from source
 
 ### ✅ Prerequisites
 
@@ -78,11 +79,10 @@ It is a terminal-based snake game using the Ratatui crate for rendering.
     - On **Windows**, Install Rust using the official .exe installer https://www.rust-lang.org/tools/install (as it
       works
       Out-Of-The-Box on windows)
-    - On **Linux** See  
-      👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
+    - On **Linux**  👉 [Installation Rust and tools for Linux](#Installation-Rust-and-tools-for-Linux) for instructions
     - On **Android** use a linux emulator and follow same instruction as linux, tested with:
         - [Android using Ubuntu](https://github.com/CypherpunkArmory/UserLAnd),
-        - [Termux](https://github.com/termux/termux-app)
+        - [Termux](https://github.com/termux/termux-app)  
           For easier use, END key works as ENTER and HOME as a pause key.
 
 ### Running
