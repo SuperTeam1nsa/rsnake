@@ -59,14 +59,12 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
     /// ```
     #[must_use]
     pub fn new(nb: u16, carte: Arc<RwLock<Map<'b>>>) -> Self {
-        let mut fruits: Vec<Fruit> = Vec::with_capacity(nb as usize);
-        {
-            let c = carte.read().unwrap();
-            for _ in 0..nb {
-                fruits.push(Self::spawn_random(&c));
-            }
-        }
-        Self { fruits, carte }
+        let mut fm = Self {
+            fruits: Vec::with_capacity(nb as usize),
+            carte,
+        };
+        fm.init(nb);
+        fm
     }
 
     /// Spawns a fruit at a random position on the map.
@@ -134,12 +132,23 @@ impl<'a, 'b> FruitsManager<'a, 'b> {
             y: rng.random_range(1..max_index_y) * csy,
         }
     }
-    pub(crate) fn resize_to_terminal(&mut self) {
+    pub(crate) fn reset_to_terminal_size(&mut self) {
         //change the position of all fruits to avoid no eatable/unreachable fruits
         for f in &mut self.fruits {
             f.set_position(Self::generate_position_rounded_by_cs(
                 &self.carte.read().unwrap(),
             ));
+        }
+    }
+    pub(crate) fn reset(&mut self) {
+        let len = u16::try_from(self.fruits.len()).unwrap();
+        self.fruits.clear();
+        self.init(len);
+    }
+    fn init(&mut self, nb: u16) {
+        for _ in 0..nb {
+            self.fruits
+                .push(Self::spawn_random(&self.carte.read().unwrap()));
         }
     }
 }

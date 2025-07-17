@@ -10,16 +10,17 @@ repository = "https://github.com/FromTheRags/rsnake"
 readme = "README.md"
 keywords = ["Ratatui", "TUI", "Snake", "Game", "retro"]
 categories = ["command-line-utilities"]
+rust-version = "1.85.0"
 
 [dependencies]
-crossterm = { version = "0.29.0", features = ["events"] }
+crossterm = { version = "0.29", features = ["events"] }
 #see https://docs.rs/ratatui/latest/ratatui/widgets/trait.WidgetRef.html need to have better performance avoiding cloning widget each time
 #https://github.com/ratatui/ratatui/discussions/1274
-ratatui = { version = "0.30.0-alpha.2", features = ["unstable-widget-ref"] }
-rand = "0.9.1"
-clap = { version = "4.5.37", features = ["derive"] }
-serde = { version = "1.0.219", features = ["derive"] }
-toml = "0.8.22"
+ratatui = { version = "0.30.0-alpha.5", features = ["unstable-widget-ref"] }
+rand = "0.9"
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
 
 
 #For testing cli easly

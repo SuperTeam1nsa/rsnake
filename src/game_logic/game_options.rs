@@ -27,11 +27,17 @@ const PARAMS_HEADER: &str = r#"
 #[derive(Parser, Serialize, Deserialize, Debug, Clone)]
 #[serde(default)]
 #[command(
+    author,
     version,
-    about = "Snake Game with CLI arguments. Quick custom run: cargo run -- -z 👾 -b 🪽 -l 10 ",
-    long_about = "A simple Snake game_logic where you can configure the velocity, \
-    snake appearance, and more using command-line arguments.
-    Example for asian vibes: rsnake -z 🐼 -b 🍥"
+    long_version = concat!("v", env!("CARGO_PKG_VERSION"), " by ", env!("CARGO_PKG_AUTHORS"),
+    env!("CARGO_PKG_DESCRIPTION"),
+    "\nRepository: ", env!("CARGO_PKG_REPOSITORY"),
+    "\nBuilt with Rust ", env!("CARGO_PKG_RUST_VERSION")),
+    about = concat!("v", env!("CARGO_PKG_VERSION"), " by ", env!("CARGO_PKG_AUTHORS"),
+    "\nSnake Game in terminal with CLI arguments.\nQuick custom run: cargo run -- -z 👾 -b 🪽 -l 10 "),
+    long_about = concat!("v", env!("CARGO_PKG_VERSION"), " by ", env!("CARGO_PKG_AUTHORS"),"\n",
+    env!("CARGO_PKG_DESCRIPTION"), " where you can configure the velocity, \
+    snake appearance, and more using command-line arguments.\nExample for asian vibes: rsnake -z 🐼 -b 🍥")
 )]
 #[derive(Default)]
 #[allow(clippy::struct_excessive_bools)]

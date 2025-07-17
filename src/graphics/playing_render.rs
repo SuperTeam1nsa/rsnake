@@ -24,11 +24,11 @@ pub fn playing_render_loop<'a: 'b, 'b>(
     state: &Arc<RwLock<GameState>>,
     serpent: &Arc<RwLock<SnakeBody>>,
     uncaps_fps: bool,
-    speed_symbol: &str,
+    speed_effect: (u16, &str),
     terminal: &mut DefaultTerminal,
 ) {
     //better to pre-format a string than doing it each time
-    let speed_text = format!("Speed: {speed_symbol}");
+    let speed_text = format!("Speed: x{}{}", speed_effect.0, speed_effect.1);
 
     //configure display variable with default value
     let mut rendering_break = false;
@@ -67,7 +67,7 @@ pub fn playing_render_loop<'a: 'b, 'b>(
                 // so use boolean to limit the number of unlocking
                 if need_carte_resize {
                     carte.write().unwrap().resize_to_terminal(area);
-                    fruits_manager.write().unwrap().resize_to_terminal();
+                    fruits_manager.write().unwrap().reset_to_terminal_size();
                     need_carte_resize = false;
                 }
                 //sub scope to release the lock faster

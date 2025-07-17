@@ -67,6 +67,7 @@ pub fn playing_logic_loop(
                 gs.write().unwrap().reset();
                 snake.write().unwrap().reset();
                 *direction.write().unwrap() = Direction::Right;
+                fruits_manager.write().unwrap().reset();
                 //graphical resize on rendering part (not really a game_logic constant)
             }
             GameStatus::ByeBye | GameStatus::Menu => break,

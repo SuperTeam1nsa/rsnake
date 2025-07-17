@@ -110,7 +110,6 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
         let game_speed = self.speed.ms_value();
         let speed_score_modifier = self.speed.score_modifier();
         let classic = self.options.classic_mode;
-
         //In a scope to have auto cleaning by auto join at the end of the main thread
         thread::scope(|s| {
             // Game logic thread
@@ -136,7 +135,7 @@ impl<'a, 'b, 'c> Game<'a, 'b, 'c> {
                 &Arc::clone(&self.state),
                 &Arc::clone(&self.serpent),
                 self.options.uncaps_fps,
-                self.speed.symbol(),
+                (self.speed.score_modifier(), self.speed.symbol()),
                 &mut self.terminal,
             );
         });

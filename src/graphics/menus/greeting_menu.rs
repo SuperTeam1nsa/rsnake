@@ -40,8 +40,7 @@ pub fn main_greeting_menu(
                         Line::from("+--------+------+------+-------+-----+-------+"),
                         Line::from("|Effects | Move | Quit | Pause | Menu| Start |"),
                         Line::from("+--------+------+------+-------+-----+-------+"),
-                        Line::from("Welcome to the craziest Snake ever! 🐍".green()),
-                        Line::from("Have a good game !  🎮".green()),
+                        Line::from("Have a good 🐍 game ! 🎮".green()),
                     ];
                     let nb_lines = lines.len();
 
@@ -93,16 +92,16 @@ pub fn main_greeting_menu(
 fn fruit_menu(frame: &mut Frame, selected: &GreetingOption) {
     //adding fruits rules, gonna left aligned for less screen space use
     let mut fruits_lines = Vec::new();
-    let tab_jonction = Line::from(" +---------+-------+-------------+-------------+");
+    let tab_jonction = Line::from("+---------+---------------------+--------+-------------+");
     fruits_lines.push(tab_jonction.clone());
     fruits_lines.push(Line::from(
-        "| Fruit   | Score | Probability | Size Effect |",
+        "| Fruit   | Base Score (xSpeed) | Chance | Size Effect |",
     ));
     fruits_lines.push(tab_jonction.clone());
     for (fruit, score, probability, size_effect) in FRUITS_SCORES_PROBABILITIES {
         //:<6 and so on are formating options, e.g., saying aligning left with min 6 chars
         fruits_lines.push(Line::from(format!(
-            " | {fruit:<6} | {score:>5} | {probability:>11} | {size_effect:>11} |"
+            "| {fruit:<6} | {score:>19} | {probability:>5}% | {size_effect:>11} |"
         )));
     }
     fruits_lines.push(tab_jonction);
@@ -120,10 +119,10 @@ fn fruit_menu(frame: &mut Frame, selected: &GreetingOption) {
 fn speed_menu(frame: &mut Frame, selected: &GreetingOption) {
     // Speed effects
     let mut speed_lines = Vec::new();
-    let speed_tab_jonction = Line::from("+------------+-------+----------------+---------+ ");
+    let speed_tab_jonction = Line::from("+------------+------------+----------------+---------+ ");
     speed_lines.push(speed_tab_jonction.clone());
     speed_lines.push(Line::from(
-        "| Speed Name | Value | Score Modifier | Symbol  | ",
+        "| Speed Name | Value (ms) | Score Modifier | Symbol  | ",
     ));
     speed_lines.push(speed_tab_jonction.clone());
     for s in speed::Speed::value_variants() {
@@ -135,7 +134,7 @@ fn speed_menu(frame: &mut Frame, selected: &GreetingOption) {
         } = s.config();
         //:<10 and so on are formating options, e.g., saying aligning left with min 10 chars
         speed_lines.push(Line::from(format!(
-            "| {name:<10} | {ms_value:>5} | {score_modifier:>14} | {symbol:<6} | "
+            "| {name:<10} | {ms_value:>10} | {score_modifier:>14} | {symbol:<6} | "
         )));
     }
     speed_lines.push(speed_tab_jonction);
@@ -166,44 +165,37 @@ fn help_menu(frame: &mut Frame, selected: &GreetingOption) {
     // - `>5` means right-aligned with width 5
     let lines = vec![
         Line::from("Snake Game Rules:".bold().yellow()),
-        Line::from(""),
+        Line::from(format!("• {:<80}", "Eat fruits to score points")),
+        Line::from(format!(
+            "    • {:<80}",
+            "Different fruits give various scores / effects, some even reduce size (and score)"
+        )),
+        Line::from(format!(
+            "   • {:<80}",
+            "Game speeds can be changed to increase difficulty and score multipliers"
+        )),
+        Line::from(format!(
+            "   • {:<80}",
+            "Check the Fruit and Speed menus for more details on game mechanics!"
+        )),
         Line::from(format!(
             "• {:<80}",
             "Control the snake using the arrow keys (←↕→)"
         )),
         Line::from(format!(
-            "• {:<80}",
-            "Eat fruits to grow longer and score points"
-        )),
-        Line::from(format!(
-            "• {:<80}",
-            "Different fruits give various scores / effects, some even reduce size (and score)"
-        )),
-        Line::from(format!(
-            "• {:<80}",
+            "   • {:<80}",
             "Avoid hitting yourself or your own tail"
         )),
         Line::from(format!(
-            "• {:<80}",
+            "   • {:<80}",
             "Walls are circulars so your head will appear on the other side of the screen"
-        )),
-        Line::from(format!(
-            "• {:<80}",
-            "Game speeds can be changed to increase difficulty and score multipliers"
         )),
         Line::from(format!("• {:<80}", "Press P or Space to pause the game")),
         Line::from(format!("• {:<80}", "Press Q to quit anytime")),
         Line::from(format!("• {:<80}", "Press R to start a new game")),
-        Line::from(format!("• {:<80}", "Press M to return to the menu")),
-        Line::from(""),
         Line::from(format!(
-            "{:<80}",
-            "Check the Fruit and Speed menus for more details on game mechanics!"
-        )),
-        Line::from(""),
-        Line::from(format!(
-            "{:<80}",
-            "If you enjoy this game consider bringing me a coffee on kofi🥤 "
+            "• {:<80}",
+            "Press M to return to the menu, and maybe consider support this game on kofi🥤"
         )),
         Line::from(get_button_span(selected)),
     ];
