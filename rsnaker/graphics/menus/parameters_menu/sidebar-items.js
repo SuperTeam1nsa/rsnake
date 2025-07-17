@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["run_multiple_choice_menu"],"struct":["MenuOption","MultipleChoiceMenu"]};

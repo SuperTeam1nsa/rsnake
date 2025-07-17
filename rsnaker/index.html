@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Snake Game using Ratatui"><title>rsnaker - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-1a91846b.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="rsnaker" data-themes="" data-resource-suffix="" data-rustdoc-version="1.88.0 (6b00bc388 2025-06-23)" data-channel="1.88.0" data-search-js="search-f7877310.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-4e99c027.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-7ef8a74a.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../rsnaker/index.html">rsnaker</a><span class="version">0.1.1</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#snake-game-using-ratatui" title="Snake Game using Ratatui">Snake Game using Ratatui</a><ul><li><a href="#features" title="Features">Features</a></li><li><a href="#todo" title="TODO">TODO</a></li><li><a href="#references" title="References">References</a></li><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#documentation-generation" title="Documentation generation">Documentation generation</a></li><li><a href="#tests" title="Tests">Tests</a></li></ul></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>rsnaker</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/rsnaker/lib.rs.html#1-94">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="snake-game-using-ratatui"><a class="doc-anchor" href="#snake-game-using-ratatui">§</a>Snake Game using Ratatui</h2>
+<p>This module implements a terminal-based snake game using the Ratatui crate for rendering.</p>
+<h3 id="features"><a class="doc-anchor" href="#features">§</a>Features</h3>
+<ul>
+<li><strong>Terminal UI</strong>: Uses Ratatui for rendering a grid-based game.</li>
+<li><strong>Game Logic</strong>: Manages snake movement, collisions, and scoring.</li>
+<li><strong>Multithreading</strong>: Uses multiple threads for input handling, rendering at 60 FPS, and game logic execution.</li>
+<li><strong>Emoji-based graphics</strong>: Supports rendering the snake using emojis instead of ASCII.</li>
+<li><strong>Configurable parameters</strong>: With <code>clap</code> for command-line arguments.</li>
+</ul>
+<h3 id="todo"><a class="doc-anchor" href="#todo">§</a>TODO</h3>
+<ul>
+<li><input disabled="" type="checkbox"/>
+Add a save score (local db) with a pseudo got from cmdline</li>
+<li><input disabled="" type="checkbox"/>
+Add some performance log with tracing for example</li>
+<li><input disabled="" type="checkbox"/>
+Fix too much life display outside of screen</li>
+</ul>
+<h3 id="references"><a class="doc-anchor" href="#references">§</a>References</h3>
+<ul>
+<li>Clippy lints: <a href="https://github.com/rust-lang/rust-clippy/">https://github.com/rust-lang/rust-clippy/</a></li>
+<li>Ratatui tutorial: <a href="https://ratatui.rs/tutorials/hello-world/">https://ratatui.rs/tutorials/hello-world/</a></li>
+<li>Example: <a href="https://ratatui.rs/examples/widgets/canvas/">https://ratatui.rs/examples/widgets/canvas/</a></li>
+</ul>
+<h3 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h3>
+<ul>
+<li>Uses <code>RwLock</code> for synchronization.</li>
+<li>Spawns separate threads for input handling, rendering (60Hz), and game logic execution.</li>
+</ul>
+<h3 id="documentation-generation"><a class="doc-anchor" href="#documentation-generation">§</a>Documentation generation</h3>
+<ul>
+<li><code>cargo doc --document-private-items --no-deps --open</code></li>
+</ul>
+<h3 id="tests"><a class="doc-anchor" href="#tests">§</a>Tests</h3>
+<ul>
+<li>As usual run them with <code>cargo test</code> the project is set up with a lib containing all the code, and a main.rs just calling it</li>
+<li>As this is a widespread pattern providing full compliance with the Rust test ecosystem, allowing doc comment to be automatically tested, for example.</li>
+</ul>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="controls/index.html" title="mod rsnaker::controls">controls</a></dt><dd>Game Control Modules</dd><dt><a class="mod" href="game_logic/index.html" title="mod rsnaker::game_logic">game_<wbr>logic</a></dt><dd>Game logic Modules</dd><dt><a class="mod" href="graphics/index.html" title="mod rsnaker::graphics">graphics</a></dt><dd>Game graphical Modules</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.start_snake.html" title="fn rsnaker::start_snake">start_<wbr>snake</a></dt><dd>Panics</dd></dl></section></div></main></body></html>

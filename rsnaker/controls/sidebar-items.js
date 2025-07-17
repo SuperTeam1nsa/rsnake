@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["direction","input","speed"]};
